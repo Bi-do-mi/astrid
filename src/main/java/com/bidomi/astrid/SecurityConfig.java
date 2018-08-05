@@ -18,7 +18,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     protected void configure(HttpSecurity http) throws Exception {
         http
                 .authorizeRequests()
-                .antMatchers("/user/add").permitAll()
+                .antMatchers("/api/add", "/api/byName",
+                        "/api/byId", "/api/byEmail", "/api/all").permitAll()
                 .anyRequest().authenticated();
     }
 

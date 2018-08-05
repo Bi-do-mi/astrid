@@ -6,14 +6,14 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 
 @Controller
-@RequestMapping(path = "/user")
+@CrossOrigin
+@RequestMapping(path = "/api")
 public class MainController {
     private static final Logger log= LoggerFactory.getLogger(MainController.class);
 
@@ -33,13 +33,28 @@ public class MainController {
         return Long.toString(n.getId());
     }
 
+    @GetMapping(path = "/byId")
+    public @ResponseBody User getById(@RequestParam long id) {
+        System.out.println("byName parameter = "+id);
+        return userRepository.findById(id);
+    }
+
     @GetMapping(path = "/byName")
-    public @ResponseBody User getByFirstName(@RequestParam String firstName){
-        return userRepository.findByFirstName(firstName).get(0);
+    public @ResponseBody
+    List<User> getByFirstName(@RequestParam String firstName){
+        System.out.println("byName parameter = "+firstName);
+        return userRepository.findByFirstName(firstName);
     }
 
     @GetMapping(path = "/byEmail")
-    public @ResponseBody String getByEmail(@RequestParam String email) {
-        return userRepository.findByEmail(email).get(0).toString();
+    public @ResponseBody List<User> getByEmail(@RequestParam String email) {
+        System.out.println("byName parameter = "+email);
+        return userRepository.findByEmail(email);
+    }
+
+    @GetMapping(path = "/all")
+    public @ResponseBody User getAll(){
+        System.out.println("getAll()");
+        return getById(11);
     }
 }
