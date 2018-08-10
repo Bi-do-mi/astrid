@@ -41,7 +41,7 @@ public class MainController {
 
     @GetMapping(path = "/byName")
     public @ResponseBody
-    List<User> getByFirstName(@RequestParam String firstName){
+    User getByFirstName(@RequestParam String firstName){
         System.out.println("byName parameter = "+firstName);
         return userRepository.findByFirstName(firstName);
     }
@@ -55,6 +55,6 @@ public class MainController {
     @GetMapping(path = "/all")
     public @ResponseBody User getAll(){
         System.out.println("getAll()");
-        return getById(11);
+        return getById(1);
     }
 }
