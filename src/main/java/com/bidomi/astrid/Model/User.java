@@ -1,27 +1,28 @@
 package com.bidomi.astrid.Model;
 
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.userdetails.UserDetails;
-
 import javax.persistence.*;
-import javax.validation.constraints.NotNull;
-import java.util.Collection;
 import java.util.List;
 
 @Entity
-public class User implements UserDetails {
+public class User  {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
-    private long id;
+    @Column(name = "user_id")
+    private Long id;
+
+    private String password;
+    private String username;
+
+    @OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+    @JoinTable(name = "user_role", joinColumns =
+    @JoinColumn(name = "user_id"), inverseJoinColumns =
+    @JoinColumn(name = "role_id"))
+    private List<Role> roles;
+
     private String firstName;
     private String lastName;
     private String email;
-
-    @ElementCollection
-    private List<Role> authorities;
-    private String password;
-    private String username;
     private boolean accountNonExpired;
     private boolean accountNonLocked;
     private boolean credentialsNonExpired;
@@ -29,24 +30,53 @@ public class User implements UserDetails {
 
     public User(){}
 
-    public User(String firstName, String lastName, @NotNull String email,
-                List<Role> authorities, String password, String username,
-                boolean accountNonExpired, boolean accountNonLocked,
-                boolean credentialsNonExpired, boolean enabled) {
-        this.firstName = firstName;
-        this.lastName = lastName;
-        this.email = email;
-        this.authorities = authorities;
-        this.password = password;
+    public User(User user) {
+        this.id=user.getId();
+        this.username=user.getUsername();
+        this.password=user.getPassword();
+        this.firstName = user.getUsername();
+        this.lastName = user.getLastName();
+        this.roles = user.getRoles();
+        this.accountNonExpired=user.isAccountNonExpired();
+        this.accountNonLocked=user.isAccountNonLocked();
+        this.credentialsNonExpired=user.isCredentialsNonExpired();
+        this.enabled=user.isEnabled();
+    }
+
+
+    public void setUsername(String username) {
         this.username = username;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
+    }
+    public void setRoles(List<Role> roles) {
+        this.roles = roles;
+    }
+
+    public void setAccountNonExpired(boolean accountNonExpired) {
         this.accountNonExpired = accountNonExpired;
+    }
+
+    public void setAccountNonLocked(boolean accountNonLocked) {
         this.accountNonLocked = accountNonLocked;
+    }
+
+    public void setCredentialsNonExpired(boolean credentialsNonExpired) {
         this.credentialsNonExpired = credentialsNonExpired;
+    }
+
+    public void setEnabled(boolean enabled) {
         this.enabled = enabled;
     }
 
-    public long getId() {
+    public Long getId() {
         return id;
+    }
+
+    public List<Role> getRoles() {
+        return roles;
     }
 
     public String getFirstName() {
@@ -72,45 +102,35 @@ public class User implements UserDetails {
     public void setEmail(String email) {
         this.email = email;
     }
+
+    public String getPassword() {
+        return password;
+    }
+
+    public String getUsername() {
+        return username;
+    }
+
+    public boolean isAccountNonExpired() {
+        return accountNonExpired;
+    }
+
+    public boolean isAccountNonLocked() {
+        return accountNonLocked;
+    }
+
+    public boolean isCredentialsNonExpired() {
+        return credentialsNonExpired;
+    }
+
+    public boolean isEnabled() {
+        return enabled;
+    }
+
     @Override
     public String toString() {
         return String.format(
                 "User [id=%d, firstName='%s', lastName='%s']",
                 id, firstName, lastName);
-    }
-
-    @Override
-    public Collection<? extends GrantedAuthority> getAuthorities() {
-        return authorities;
-    }
-
-    @Override
-    public String getPassword() {
-        return password;
-    }
-
-    @Override
-    public String getUsername() {
-        return username;
-    }
-
-    @Override
-    public boolean isAccountNonExpired() {
-        return accountNonExpired;
-    }
-
-    @Override
-    public boolean isAccountNonLocked() {
-        return accountNonLocked;
-    }
-
-    @Override
-    public boolean isCredentialsNonExpired() {
-        return credentialsNonExpired;
-    }
-
-    @Override
-    public boolean isEnabled() {
-        return enabled;
     }
 }

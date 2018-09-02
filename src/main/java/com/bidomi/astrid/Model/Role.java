@@ -1,12 +1,28 @@
 package com.bidomi.astrid.Model;
 
-import org.springframework.security.core.GrantedAuthority;
+import javax.persistence.*;
 
-public enum Role implements GrantedAuthority {
-    GUEST;
+@Entity
+public class Role {
+    @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    @Column(name = "role_id")
+    private Long id;
+    private String role;
 
-    @Override
-    public String getAuthority() {
-        return name();
+    Role() {
+    }
+
+    public Role(String role) {
+        this.role = role;
+
+    }
+
+    public String getRole() {
+        return role;
+    }
+
+    public void setRole(String role) {
+        this.role = role;
     }
 }
