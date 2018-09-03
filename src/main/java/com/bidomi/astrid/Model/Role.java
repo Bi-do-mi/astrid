@@ -12,6 +12,7 @@ public class Role {
 
     Role() {
     }
+
     public Role(String role) {
         this.role = role;
 

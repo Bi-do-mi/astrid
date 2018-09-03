@@ -35,12 +35,17 @@ public class UserController {
         this.messageService = messageService;
     }
 
-//    @PostMapping("/sign-up")
-//    public void signUp(@RequestBody User user){
-//        log.info("Post mapping sign-up work!");
-//        user.setPassword(bCryptPasswordEncoder.encode(user.getPassword()));
-//        userRepository.save(user);
-//    }
+    @PostMapping("/sign_up")
+    public void signUp(@RequestBody User user) {
+        log.info("Post mapping sign-up work!");
+        user.setPassword(new BCryptPasswordEncoder().encode(user.getPassword()));
+        try {
+            userRepository.save(user);
+        } catch (Exception e) {
+            log.error(e.getMessage());
+            throw (e);
+        }
+    }
 
     //    @GetMapping(path = "/authenticate")
 //    public @ResponseBody User findByUsername(@RequestParam HttpServletRequest req){
@@ -50,16 +55,17 @@ public class UserController {
     @PreAuthorize("hasAnyRole('USER')")
     @GetMapping("/user")
     @ResponseBody
+    public User user() {
+        String currentPrincipalName = SecurityContextHolder.getContext().getAuthentication().getName();
+        return userRepository.findByUsername(currentPrincipalName).get();
+    }
 //    public Principal user(Principal user) {
+//        String currentPrincipalName = SecurityContextHolder.getContext().getAuthentication().getName();
+//        log.info("Log Principal to string" + currentPrincipalName);
 //        return user;
 //    }
-    public Principal user(Principal user) {
-        String currentPrincipalName = SecurityContextHolder.getContext().getAuthentication().getName();
-        log.info("Log Principal to string" + currentPrincipalName);
-        return user;
-    }
 
-//    @PreAuthorize("hasAnyRole('USER')")
+    //    @PreAuthorize("hasAnyRole('USER')")
     @GetMapping(path = "/")
     public @ResponseBody
     List<com.bidomi.astrid.Model.User> getAll() {
