@@ -5,6 +5,8 @@ import com.bidomi.astrid.Repositories.UserRepository;
 import com.bidomi.astrid.Services.MessageService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.core.Authentication;
@@ -14,10 +16,14 @@ import org.springframework.security.web.header.Header;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.xml.ws.http.HTTPException;
 import java.security.Principal;
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.Set;
+
+import static org.springframework.http.ResponseEntity.ok;
 
 
 //@CrossOrigin(origins = "*", maxAge = 3600)
@@ -46,6 +52,17 @@ public class UserController {
             throw (e);
         }
     }
+
+    @GetMapping("/name_check")
+    @ResponseBody
+    public String nameCheck(@RequestParam(value = "name") String name) {
+        try {
+        return userRepository.findByUsername(name).get().getUsername();
+        } catch (NoSuchElementException e) {
+            return "";
+        }
+    }
+
 
     //    @GetMapping(path = "/authenticate")
 //    public @ResponseBody User findByUsername(@RequestParam HttpServletRequest req){
