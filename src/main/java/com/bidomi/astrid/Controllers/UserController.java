@@ -59,7 +59,7 @@ public class UserController {
         try {
         return userRepository.findByUsername(name).get().getUsername();
         } catch (NoSuchElementException e) {
-            return "";
+            return "not found";
         }
     }
 
