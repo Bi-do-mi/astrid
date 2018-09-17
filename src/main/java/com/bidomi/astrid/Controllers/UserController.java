@@ -1,29 +1,23 @@
 package com.bidomi.astrid.Controllers;
 
+import com.bidomi.astrid.Model.Role;
 import com.bidomi.astrid.Model.User;
 import com.bidomi.astrid.Repositories.UserRepository;
 import com.bidomi.astrid.Services.MessageService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.security.web.header.Header;
 import org.springframework.web.bind.annotation.*;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.xml.ws.http.HTTPException;
-import java.security.Principal;
+import java.sql.Timestamp;
+import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.NoSuchElementException;
-import java.util.Optional;
-import java.util.Set;
-
-import static org.springframework.http.ResponseEntity.ok;
 
 
 //@CrossOrigin(origins = "*", maxAge = 3600)
@@ -43,8 +37,11 @@ public class UserController {
 
     @PostMapping("/sign_up")
     public void signUp(@RequestBody User user) {
-        log.info("Post mapping sign-up work!");
         user.setPassword(new BCryptPasswordEncoder().encode(user.getPassword()));
+        List<Role> roles = new ArrayList<Role>();
+        roles.add(new Role("USER"));
+        user.setRoles(roles);
+        user.setLastVisit(new Date());
         try {
             userRepository.save(user);
         } catch (Exception e) {
@@ -57,39 +54,31 @@ public class UserController {
     @ResponseBody
     public String nameCheck(@RequestParam(value = "name") String name) {
         try {
-        return userRepository.findByUsername(name).get().getUsername();
+            return userRepository.findByUsername(name).get().getUsername();
         } catch (NoSuchElementException e) {
             return "not found";
         }
     }
 
-
-    //    @GetMapping(path = "/authenticate")
-//    public @ResponseBody User findByUsername(@RequestParam HttpServletRequest req){
-//        System.out.println("authenticate()");
-//        return this.userRepository.findByUsername(req.getParameter("username"));
-//    }
     @PreAuthorize("hasAnyRole('USER')")
     @GetMapping("/user")
     @ResponseBody
     public User user() {
         String currentPrincipalName = SecurityContextHolder.getContext().getAuthentication().getName();
-        return userRepository.findByUsername(currentPrincipalName).get();
+        log.info(currentPrincipalName);
+        User u=userRepository.findByUsername(currentPrincipalName).get();
+        u.setLastVisit(new Date());
+        return  userRepository.save(u);
     }
-//    public Principal user(Principal user) {
-//        String currentPrincipalName = SecurityContextHolder.getContext().getAuthentication().getName();
-//        log.info("Log Principal to string" + currentPrincipalName);
-//        return user;
-//    }
 
-    //    @PreAuthorize("hasAnyRole('USER')")
+    @PreAuthorize("hasAnyRole('USER')")
     @GetMapping(path = "/")
     public @ResponseBody
     List<com.bidomi.astrid.Model.User> getAll() {
-        System.out.println(messageService.getMessage());
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        String currentPrincipalName = authentication.getName();
-        System.out.println("getAll()" + currentPrincipalName);
+//        System.out.println(messageService.getMessage());
+//        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+//        String currentPrincipalName = authentication.getName();
+//        System.out.println("getAll()" + currentPrincipalName);
         return this.userRepository.findAll();
     }
 }

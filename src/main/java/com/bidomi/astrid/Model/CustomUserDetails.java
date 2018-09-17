@@ -5,7 +5,7 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.Collection;
-import java.util.Optional;
+import java.util.Date;
 import java.util.stream.Collectors;
 
 public class CustomUserDetails extends User implements UserDetails {
@@ -50,5 +50,10 @@ public class CustomUserDetails extends User implements UserDetails {
     @Override
     public boolean isEnabled() {
         return super.isEnabled();
+    }
+
+    @Override
+    public Date getLastVisit() {
+        return super.getLastVisit();
     }
 }

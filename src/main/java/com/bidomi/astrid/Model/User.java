@@ -1,6 +1,7 @@
 package com.bidomi.astrid.Model;
 
 import javax.persistence.*;
+import java.util.Date;
 import java.util.List;
 
 @Entity
@@ -22,11 +23,12 @@ public class User  {
 
     private String firstName;
     private String lastName;
-    private String email;
     private boolean accountNonExpired;
     private boolean accountNonLocked;
     private boolean credentialsNonExpired;
     private boolean enabled;
+    @Column(name = "last_visit")
+    private Date lastVisit;
 
     public User(){}
 
@@ -41,6 +43,7 @@ public class User  {
         this.accountNonLocked=user.isAccountNonLocked();
         this.credentialsNonExpired=user.isCredentialsNonExpired();
         this.enabled=user.isEnabled();
+        this.lastVisit =user.getLastVisit();
     }
 
 
@@ -95,14 +98,6 @@ public class User  {
         this.lastName = lastName;
     }
 
-    public String getEmail() {
-        return email;
-    }
-
-    public void setEmail(String email) {
-        this.email = email;
-    }
-
     public String getPassword() {
         return password;
     }
@@ -125,6 +120,14 @@ public class User  {
 
     public boolean isEnabled() {
         return enabled;
+    }
+
+    public Date getLastVisit() {
+        return lastVisit;
+    }
+
+    public void setLastVisit(Date lastVisit) {
+        this.lastVisit = lastVisit;
     }
 
     @Override

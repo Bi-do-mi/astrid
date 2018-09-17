@@ -37,7 +37,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .and()
                 .csrf().disable()
                 .authorizeRequests()
-                .antMatchers("/index.html", "/rest/users/sign_up", "/rest/users/name_check/**", "/home", "/login")
+                .antMatchers("/index.html", "/rest/users/sign_up", "/rest/users/user",
+                        "/rest/users/name_check", "/home", "/login")
                 .permitAll()
                 .anyRequest().authenticated();
         // .and().formLogin().permitAll();
@@ -57,16 +58,5 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
     private PasswordEncoder getPasswordEncoder() {
         return new BCryptPasswordEncoder();
-// return new PasswordEncoder() {
-//            @Override
-//            public String encode(CharSequence charSequence) {
-//                return charSequence.toString();
-//            }
-//
-//            @Override
-//            public boolean matches(CharSequence charSequence, String s) {
-//                return true;
-//            }
-//        };
     }
 }

@@ -20,15 +20,6 @@ public class UserDetailsServiceImpl implements UserDetailsService {
     @Autowired
     private UserRepository userRepository;
 
-//    @PostConstruct
-//    public void init(){
-//        userRepository.findByUsername("Alla").ifPresent(user -> {
-//            user.setPassword(new BCryptPasswordEncoder()
-//                    .encode("password"));
-//            userRepository.save(user);
-//        });
-//    }
-
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         Optional<User> user = userRepository.findByUsername(username);

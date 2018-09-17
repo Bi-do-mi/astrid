@@ -10,7 +10,7 @@ public class Role {
     private Long id;
     private String role;
 
-    Role() {
+    public Role() {
     }
 
     public Role(String role) {
