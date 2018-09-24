@@ -1,11 +1,13 @@
 package com.bidomi.astrid.Model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import javax.persistence.*;
 import java.util.Date;
 import java.util.List;
 
 @Entity
-public class User  {
+public class User {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
@@ -30,20 +32,25 @@ public class User  {
     @Column(name = "last_visit")
     private Date lastVisit;
 
-    public User(){}
+    @Column(name = "confirmation_token")
+    private String confirmationToken;
+
+    public User() {
+    }
 
     public User(User user) {
-        this.id=user.getId();
-        this.username=user.getUsername();
-        this.password=user.getPassword();
+        this.id = user.getId();
+        this.username = user.getUsername();
+        this.password = user.getPassword();
         this.firstName = user.getUsername();
         this.lastName = user.getLastName();
         this.roles = user.getRoles();
-        this.accountNonExpired=user.isAccountNonExpired();
-        this.accountNonLocked=user.isAccountNonLocked();
-        this.credentialsNonExpired=user.isCredentialsNonExpired();
-        this.enabled=user.isEnabled();
-        this.lastVisit =user.getLastVisit();
+        this.accountNonExpired = user.isAccountNonExpired();
+        this.accountNonLocked = user.isAccountNonLocked();
+        this.credentialsNonExpired = user.isCredentialsNonExpired();
+        this.enabled = user.isEnabled();
+        this.lastVisit = user.getLastVisit();
+        this.confirmationToken = user.getConfirmationToken();
     }
 
 
@@ -54,6 +61,7 @@ public class User  {
     public void setPassword(String password) {
         this.password = password;
     }
+
     public void setRoles(List<Role> roles) {
         this.roles = roles;
     }
@@ -128,6 +136,14 @@ public class User  {
 
     public void setLastVisit(Date lastVisit) {
         this.lastVisit = lastVisit;
+    }
+
+    public String getConfirmationToken() {
+        return confirmationToken;
+    }
+
+    public void setConfirmationToken(String confirmationToken) {
+        this.confirmationToken = confirmationToken;
     }
 
     @Override

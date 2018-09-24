@@ -1,9 +1,11 @@
 package com.bidomi.astrid.Model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
+import java.beans.Transient;
 import java.util.Collection;
 import java.util.Date;
 import java.util.stream.Collectors;
@@ -23,6 +25,7 @@ public class CustomUserDetails extends User implements UserDetails {
     }
 
     @Override
+    @JsonIgnore
     public String getPassword() {
         return super.getPassword();
     }
@@ -55,5 +58,10 @@ public class CustomUserDetails extends User implements UserDetails {
     @Override
     public Date getLastVisit() {
         return super.getLastVisit();
+    }
+
+    @Override
+    public String getConfirmationToken() {
+        return super.getConfirmationToken();
     }
 }
