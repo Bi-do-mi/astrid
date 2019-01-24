@@ -50,7 +50,7 @@ public class UserController {
         String message = "<p>Вы зарегистрировались на сайте \"Астрид\".\n" +
                 "\n" +
                 "Для завершения регистрации, пожалуйста, подтвердите ваш электронный адрес:\n</p>" +
-                "<a href='http://localhost:4200/login?token=" + user.getConfirmationToken() + "&target=enable_user'>" +
+                "<a href='http://localhost:4200/preload/login?token=" + user.getConfirmationToken() + "&target=enable_user'>" +
                 "http://localhost:4200/login\n</a>" +
                 "<p>Если вы не регистрировались на сайте \"Астрид\" — просто проигнорируйте это письмо.\n</p>";
 
@@ -82,9 +82,9 @@ public class UserController {
                 u.setEnabled(true);
                 u.setConfirmationToken(null);
                 userRepository.save(u);
-                return "enable_user true";
+                return "true";
             }
-            return "enable_user false";
+            return "false";
         } catch (NoSuchElementException e) {
             return "not found";
         }
@@ -101,8 +101,8 @@ public class UserController {
                 String message = "<p>Вы или кто-то другой попытались сменить пароль на сайте \"Астрид\".\n" +
                         "\n" +
                         "Для смены пароля нажмите на ссылку ниже:\n</p>" +
-                        "<a href='http://localhost:4200/login?token=" + u.getConfirmationToken() + "&target=new_password'>" +
-                        "http://localhost:4200/login\n</a>" +
+                        "<a href='http://localhost:4200/preload/login?token=" + u.getConfirmationToken() + "&target=new_password'>" +
+                        "http://localhost:4200/preload/login\n</a>" +
                         "<p>Если это были не Вы — просто проигнорируйте это письмо.\n</p>";
 
                 emailService.sendMail("noreplay", u.getUsername(), "Астрид. Смена пароля.", message);
@@ -110,33 +110,74 @@ public class UserController {
             }
             return "set_user_token false";
         } catch (NoSuchElementException e) {
-            return "not found";
+//            System.out.println("NoSuchElementException "+e.getMessage());
+            return e.getMessage();
         }
     }
 
-    @PreAuthorize("hasAnyRole('USER')")
+    //    @PreAuthorize("hasAnyRole('USER')")
     @GetMapping("/sign_in")
     @ResponseBody
-    public User user(@RequestParam(value = "token") String token, @RequestParam(value = "np") String newPassword) {
+    public User user() {
+        System.out.println("In /sign_in");
         String currentPrincipalName = SecurityContextHolder.getContext().getAuthentication().getName();
-        String decodedNewPassword = new String(Base64.getDecoder().decode(newPassword));
         try {
             User u = userRepository.findByUsername(currentPrincipalName).get();
             u.setLastVisit(new Date());
+            u = userRepository.save(u);
+            u.setPassword(null);
+            return u;
+        } catch (Exception ex) {
+            System.out.println("/sign_in exception: " + ex.getMessage());
+            return null;
+        }
+    }
+
+    @PutMapping("/update_user")
+    @ResponseBody
+    public User updateUser(@RequestBody User user) {
+        System.out.println("In /update_user");
+        String currentPrincipalName = SecurityContextHolder.getContext().getAuthentication().getName();
+        try {
+            System.out.println("Incoming User: " + user);
+            System.out.println("CurrentPrincipalName: " + currentPrincipalName);
+            User u = userRepository.findById(user.getId()).get();
+            u.setLastVisit(new Date());
+            u.setFirstName(user.getFirstName());
+            u.setLastName(user.getLastName());
+            u.setPhoneNumber(user.getPhoneNumber());
+            u = userRepository.save(u);
+            u.setPassword(null);
+            return u;
+        } catch (Exception ex) {
+            System.out.println("/update_user exception: " + ex.getMessage());
+            return null;
+        }
+    }
+
+    @GetMapping("/change_password")
+    @ResponseBody
+    public String changePassword(@RequestParam(value = "token") String token, @RequestParam(value = "login") String login,
+                                 @RequestParam(value = "np") String newPassword) {
+        System.out.println("In /change_password");
+        String decodedNewPassword = new String(Base64.getDecoder().decode(newPassword));
+        try {
+            User u = userRepository.findByUsername(login).get();
             if (!decodedNewPassword.equals("") && u.getConfirmationToken().equals(token)) {
                 u.setPassword(new BCryptPasswordEncoder().encode(decodedNewPassword));
                 u.setConfirmationToken(null);
                 emailService.sendMail("noreplay", u.getUsername(), "Астрид. Смена пароля.",
                         "Пароль был изменен.");
+                u = userRepository.save(u);
+                u.setPassword(null);
+                return "true";
             }
-            u=userRepository.save(u);
-            u.setPassword(null);
-            return u;
+            return "false";
         } catch (Exception ex) {
-            return null;
+            System.out.println("/change_password exception: " + ex.getMessage());
+            return     ex.getMessage();
         }
     }
-
 
     @PreAuthorize("hasAnyRole('USER')")
     @GetMapping(path = "/")

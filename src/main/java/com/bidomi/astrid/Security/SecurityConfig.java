@@ -39,7 +39,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .authorizeRequests()
                 .antMatchers("/index.html", "/rest/users/sign_up", "/rest/users/sign_in",
                         "/rest/users/name_check", "/home", "/login", "/rest/users/enable_user",
-                        "/rest/users/set_user_token")
+                        "/rest/users/set_user_token", "/rest/users/change_password", "/rest/users/update_user")
                 .permitAll()
                 .anyRequest().authenticated();
         // .and().formLogin().permitAll();

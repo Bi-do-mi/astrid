@@ -64,4 +64,7 @@ public class CustomUserDetails extends User implements UserDetails {
     public String getConfirmationToken() {
         return super.getConfirmationToken();
     }
+
+    @Override
+    public String getPhoneNumber() { return super.getPhoneNumber(); }
 }

@@ -31,9 +31,10 @@ public class User {
     private boolean enabled;
     @Column(name = "last_visit")
     private Date lastVisit;
-
     @Column(name = "confirmation_token")
     private String confirmationToken;
+    @Column(name = "phone_number")
+    private String phoneNumber;
 
     public User() {
     }
@@ -51,6 +52,7 @@ public class User {
         this.enabled = user.isEnabled();
         this.lastVisit = user.getLastVisit();
         this.confirmationToken = user.getConfirmationToken();
+        this.phoneNumber = user.getPhoneNumber();
     }
 
 
@@ -145,6 +147,15 @@ public class User {
     public void setConfirmationToken(String confirmationToken) {
         this.confirmationToken = confirmationToken;
     }
+
+    public String getPhoneNumber() {
+        return phoneNumber;
+    }
+
+    public void setPhoneNumber(String phoneNumber) {
+        this.phoneNumber = phoneNumber;
+    }
+
 
     @Override
     public String toString() {
