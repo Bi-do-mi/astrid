@@ -29,8 +29,10 @@ public class User {
     private boolean accountNonLocked;
     private boolean credentialsNonExpired;
     private boolean enabled;
+    @Column(name = "registration_date")
+    private Long registrationDate;
     @Column(name = "last_visit")
-    private Date lastVisit;
+    private Long lastVisit;
     @Column(name = "confirmation_token")
     private String confirmationToken;
     @Column(name = "phone_number")
@@ -132,11 +134,15 @@ public class User {
         return enabled;
     }
 
-    public Date getLastVisit() {
+    public Long getRegistrationDate() { return registrationDate; }
+
+    public void setRegistrationDate(Long registrationDate) { this.registrationDate = registrationDate; }
+
+    public Long getLastVisit() {
         return lastVisit;
     }
 
-    public void setLastVisit(Date lastVisit) {
+    public void setLastVisit(Long lastVisit) {
         this.lastVisit = lastVisit;
     }
 

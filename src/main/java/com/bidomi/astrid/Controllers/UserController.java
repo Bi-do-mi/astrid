@@ -8,11 +8,8 @@ import com.bidomi.astrid.Services.MessageService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.mail.SimpleMailMessage;
-import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
-import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.bind.annotation.*;
@@ -43,7 +40,8 @@ public class UserController {
         List<Role> roles = new ArrayList<Role>();
         roles.add(new Role("USER"));
         user.setRoles(roles);
-        user.setLastVisit(new Date());
+        user.setRegistrationDate(System.currentTimeMillis());
+        user.setLastVisit(System.currentTimeMillis());
         user.setEnabled(false);
         user.setConfirmationToken(UUID.randomUUID().toString());
 
@@ -123,9 +121,10 @@ public class UserController {
         String currentPrincipalName = SecurityContextHolder.getContext().getAuthentication().getName();
         try {
             User u = userRepository.findByUsername(currentPrincipalName).get();
-            u.setLastVisit(new Date());
+            u.setLastVisit(System.currentTimeMillis());
             u = userRepository.save(u);
             u.setPassword(null);
+//            log.info(u.getLastVisit().toString());
             return u;
         } catch (Exception ex) {
             System.out.println("/sign_in exception: " + ex.getMessage());
@@ -139,10 +138,10 @@ public class UserController {
         System.out.println("In /update_user");
         String currentPrincipalName = SecurityContextHolder.getContext().getAuthentication().getName();
         try {
-            System.out.println("Incoming User: " + user);
-            System.out.println("CurrentPrincipalName: " + currentPrincipalName);
+//            System.out.println("Incoming User: " + user);
+//            System.out.println("CurrentPrincipalName: " + currentPrincipalName);
             User u = userRepository.findById(user.getId()).get();
-            u.setLastVisit(new Date());
+            u.setLastVisit(System.currentTimeMillis());
             u.setFirstName(user.getFirstName());
             u.setLastName(user.getLastName());
             u.setPhoneNumber(user.getPhoneNumber());

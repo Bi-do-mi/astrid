@@ -56,7 +56,10 @@ public class CustomUserDetails extends User implements UserDetails {
     }
 
     @Override
-    public Date getLastVisit() {
+    public Long getRegistrationDate() { return super.getRegistrationDate(); }
+
+    @Override
+    public Long getLastVisit() {
         return super.getLastVisit();
     }
 
