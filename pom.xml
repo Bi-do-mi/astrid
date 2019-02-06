@@ -6,7 +6,7 @@
     <groupId>com.bidomi</groupId>
     <artifactId>astrid</artifactId>
     <version>0.0.1-SNAPSHOT</version>
-    <packaging>jar</packaging>
+    <packaging>war</packaging>
 
     <!--<role>astrid</role>-->
     <!--<description>Astrid project</description>-->
@@ -37,7 +37,7 @@
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-devtools</artifactId>
-            <scope>runtime</scope>
+            <optional>true</optional>
         </dependency>
 
         <dependency>
@@ -72,10 +72,16 @@
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
             <version>1.18.0</version>
+            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-mail</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-tomcat</artifactId>
+            <scope>provided</scope>
         </dependency>
     </dependencies>
 
@@ -92,51 +98,60 @@
     </dependencyManagement>
 
     <build>
+        <finalName>ROOT</finalName>
         <plugins>
             <plugin>
-                <groupId>org.springframework.boot</groupId>
-                <artifactId>spring-boot-maven-plugin</artifactId>
-            </plugin>
-            <plugin>
-                <groupId>com.github.eirslett</groupId>
-                <artifactId>frontend-maven-plugin</artifactId>
-                <version>1.6</version>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-war-plugin</artifactId>
                 <configuration>
-                    <nodeVersion>v8.8.1</nodeVersion>
+                    <outputDirectory>target
+                    </outputDirectory>
                 </configuration>
-                <executions>
-                    <execution>
-                        <id>install-npm</id>
-                        <goals>
-                            <goal>install-node-and-npm</goal>
-                        </goals>
-                        <phase>generate-resources</phase>
-                    </execution>
-                </executions>
             </plugin>
+            <!--<plugin>-->
+            <!--<groupId>org.springframework.boot</groupId>-->
+            <!--<artifactId>spring-boot-maven-plugin</artifactId>-->
+            <!--</plugin>-->
+            <!--<plugin>-->
+            <!--<groupId>com.github.eirslett</groupId>-->
+            <!--<artifactId>frontend-maven-plugin</artifactId>-->
+            <!--<version>1.6</version>-->
+            <!--<configuration>-->
+            <!--<nodeVersion>v8.8.1</nodeVersion>-->
+            <!--</configuration>-->
+            <!--<executions>-->
+            <!--<execution>-->
+            <!--<id>install-npm</id>-->
+            <!--<goals>-->
+            <!--<goal>install-node-and-npm</goal>-->
+            <!--</goals>-->
+            <!--<phase>generate-resources</phase>-->
+            <!--</execution>-->
+            <!--</executions>-->
+            <!--</plugin>-->
 
         </plugins>
     </build>
 
     <!--<repositories>-->
-        <!--<repository>-->
-            <!--<id>spring-releases</id>-->
-            <!--<role>Spring Releases</role>-->
-            <!--<url>https://repo.spring.io/libs-release</url>-->
-        <!--</repository>-->
-        <!--<repository>-->
-            <!--<id>org.jboss.repository.releases</id>-->
-            <!--<role>JBoss Maven Release Repository</role>-->
-            <!--<url>https://repository.jboss.org/nexus/content/repositories/releases</url>-->
-        <!--</repository>-->
+    <!--<repository>-->
+    <!--<id>spring-releases</id>-->
+    <!--<role>Spring Releases</role>-->
+    <!--<url>https://repo.spring.io/libs-release</url>-->
+    <!--</repository>-->
+    <!--<repository>-->
+    <!--<id>org.jboss.repository.releases</id>-->
+    <!--<role>JBoss Maven Release Repository</role>-->
+    <!--<url>https://repository.jboss.org/nexus/content/repositories/releases</url>-->
+    <!--</repository>-->
     <!--</repositories>-->
 
     <!--<pluginRepositories>-->
-        <!--<pluginRepository>-->
-            <!--<id>spring-releases</id>-->
-            <!--<role>Spring Releases</role>-->
-            <!--<url>https://repo.spring.io/libs-release</url>-->
-        <!--</pluginRepository>-->
+    <!--<pluginRepository>-->
+    <!--<id>spring-releases</id>-->
+    <!--<role>Spring Releases</role>-->
+    <!--<url>https://repo.spring.io/libs-release</url>-->
+    <!--</pluginRepository>-->
     <!--</pluginRepositories>-->
 
 </project>

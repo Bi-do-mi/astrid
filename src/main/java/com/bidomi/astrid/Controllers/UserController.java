@@ -116,7 +116,7 @@ public class UserController {
     //    @PreAuthorize("hasAnyRole('USER')")
     @GetMapping("/sign_in")
     @ResponseBody
-    public User user() {
+    public User signIn() {
         System.out.println("In /sign_in");
         String currentPrincipalName = SecurityContextHolder.getContext().getAuthentication().getName();
         try {
@@ -162,6 +162,7 @@ public class UserController {
         String decodedNewPassword = new String(Base64.getDecoder().decode(newPassword));
         try {
             User u = userRepository.findByUsername(login).get();
+//            System.out.println(u.getConfirmationToken() + "-----" + u.toString());
             if (!decodedNewPassword.equals("") && u.getConfirmationToken().equals(token)) {
                 u.setPassword(new BCryptPasswordEncoder().encode(decodedNewPassword));
                 u.setConfirmationToken(null);
@@ -174,7 +175,26 @@ public class UserController {
             return "false";
         } catch (Exception ex) {
             System.out.println("/change_password exception: " + ex.getMessage());
-            return     ex.getMessage();
+            return ex.getMessage();
+        }
+    }
+
+    //    @PreAuthorize("hasAnyRole('USER')")
+    @DeleteMapping("/deleteUser")
+    @ResponseBody
+    public String deleteUser(@RequestParam(value = "id") Long id, @RequestParam(value = "token") Long token) {
+        try {
+            User u = userRepository.findById(id).get();
+            u.setLastVisit(System.currentTimeMillis());
+//            System.out.println("In /deleteUser" + id + "---" + token + "---" + u.getRegistrationDate());
+            if (u.getRegistrationDate().equals(token)) {
+                userRepository.delete(u);
+                return "true";
+            }
+            return "false";
+        } catch (Exception ex) {
+            System.out.println("/deleteUser exception: " + ex.getMessage());
+            return "false";
         }
     }
 
@@ -188,4 +208,15 @@ public class UserController {
 //        System.out.println("getAll()" + currentPrincipalName);
         return this.userRepository.findAll();
     }
+
+//    @PreAuthorize("hasAnyRole('USER')")
+//    @GetMapping(path = "/")
+//    public @ResponseBody
+//    String getHello() {
+////        System.out.println(messageService.getMessage());
+////        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+////        String currentPrincipalName = authentication.getName();
+////        System.out.println("getAll()" + currentPrincipalName);
+//        return "Helloooo";
+//    }
 }
