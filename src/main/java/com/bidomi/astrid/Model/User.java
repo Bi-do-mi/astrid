@@ -1,42 +1,69 @@
 package com.bidomi.astrid.Model;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
+import org.apache.coyote.Constants;
+import org.hibernate.annotations.DynamicInsert;
+import org.hibernate.annotations.DynamicUpdate;
 
 import javax.persistence.*;
-import java.util.Date;
-import java.util.List;
+import java.util.ArrayList;
+import java.util.Collection;
 
 @Entity
+@Table(name = "USERS")
+@DynamicInsert
+@DynamicUpdate
 public class User {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    @Column(name = "user_id")
+    @GeneratedValue (generator = "ID_GENERATOR")
+    @Column(name = "USER_ID", columnDefinition = "BIGINT(20) UNSIGNED")
     private Long id;
-
+    @Column(nullable = false, length = 255)
     private String password;
+    @Column(nullable = false, unique = true, length = 60)
     private String username;
 
-    @OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
-    @JoinTable(name = "user_role", joinColumns =
-    @JoinColumn(name = "user_id"), inverseJoinColumns =
-    @JoinColumn(name = "role_id"))
-    private List<Role> roles;
+//    @OneToMany(fetch = FetchType.EAGER, cascade = {CascadeType.ALL})
+//    @JoinTable(name = "user_role", joinColumns =
+//    @JoinColumn(name = "user_id"), inverseJoinColumns =
+//    @JoinColumn(name = "role_id"))
+//    @Column(nullable = false)
+//    private List<Role> roles;
+    @ElementCollection(fetch = FetchType.EAGER)
+    @CollectionTable (name = "ROLE")
+    @org.hibernate.annotations.CollectionId(
+            columns = @Column(name = "ROLE_ID"),
+            type = @org.hibernate.annotations.Type(type = "long"),
+            generator = "ID_GENERATOR" )
+    private Collection<Role> roles = new ArrayList<Role>();
 
+    @Column(length = 255, nullable = false)
     private String firstName;
+    @Column(length = 255)
     private String lastName;
     private boolean accountNonExpired;
     private boolean accountNonLocked;
     private boolean credentialsNonExpired;
     private boolean enabled;
-    @Column(name = "registration_date")
+    @Column(name = "registration_date", columnDefinition = "BIGINT(20) UNSIGNED")
     private Long registrationDate;
-    @Column(name = "last_visit")
+    @Column(name = "last_visit", columnDefinition = "BIGINT(20) UNSIGNED")
     private Long lastVisit;
-    @Column(name = "confirmation_token")
+    @Column(name = "confirmation_token", length = 255)
     private String confirmationToken;
-    @Column(name = "phone_number")
+    @Column(name = "phone_number", length = 15)
     private String phoneNumber;
+    @Column(name = "park_name", length = 60)
+    private String parkName;
+
+    @OneToOne(fetch = FetchType.LAZY,
+            cascade = {CascadeType.PERSIST, CascadeType.REMOVE})
+    @JoinTable(name = "USER_BPOINT",
+            joinColumns = @JoinColumn(name = "USER_ID",
+                    nullable = false, unique = true),
+            inverseJoinColumns =
+            @JoinColumn(name = "POINT_ID"))
+    private BasePoint basePoint;
 
     public User() {
     }
@@ -55,6 +82,8 @@ public class User {
         this.lastVisit = user.getLastVisit();
         this.confirmationToken = user.getConfirmationToken();
         this.phoneNumber = user.getPhoneNumber();
+        this.parkName = user.getParkName();
+        this.basePoint = user.getBasePoint();
     }
 
 
@@ -66,7 +95,7 @@ public class User {
         this.password = password;
     }
 
-    public void setRoles(List<Role> roles) {
+    public void setRoles(Collection<Role> roles) {
         this.roles = roles;
     }
 
@@ -90,7 +119,7 @@ public class User {
         return id;
     }
 
-    public List<Role> getRoles() {
+    public Collection<Role> getRoles() {
         return roles;
     }
 
@@ -134,9 +163,13 @@ public class User {
         return enabled;
     }
 
-    public Long getRegistrationDate() { return registrationDate; }
+    public Long getRegistrationDate() {
+        return registrationDate;
+    }
 
-    public void setRegistrationDate(Long registrationDate) { this.registrationDate = registrationDate; }
+    public void setRegistrationDate(Long registrationDate) {
+        this.registrationDate = registrationDate;
+    }
 
     public Long getLastVisit() {
         return lastVisit;
@@ -162,6 +195,13 @@ public class User {
         this.phoneNumber = phoneNumber;
     }
 
+    public String getParkName() { return parkName; }
+
+    public void setParkName(String parkName) { this.parkName = parkName; }
+
+    public BasePoint getBasePoint() { return basePoint; }
+
+    public void setBasePoint(BasePoint basePoint) { this.basePoint = basePoint; }
 
     @Override
     public String toString() {

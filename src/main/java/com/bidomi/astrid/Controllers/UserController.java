@@ -132,13 +132,15 @@ public class UserController {
         }
     }
 
+
     @PutMapping("/update_user")
     @ResponseBody
     public User updateUser(@RequestBody User user) {
         System.out.println("In /update_user");
-        String currentPrincipalName = SecurityContextHolder.getContext().getAuthentication().getName();
+//        String currentPrincipalName = SecurityContextHolder.getContext().getAuthentication().getName();
+//        System.out.println(currentPrincipalName);
         try {
-//            System.out.println("Incoming User: " + user);
+//            System.out.println("Incoming User: " + userRef);
 //            System.out.println("CurrentPrincipalName: " + currentPrincipalName);
             User u = userRepository.findById(user.getId()).get();
             u.setLastVisit(System.currentTimeMillis());
@@ -179,19 +181,18 @@ public class UserController {
         }
     }
 
-    //    @PreAuthorize("hasAnyRole('USER')")
+    @PreAuthorize("hasAnyRole('USER')")
     @DeleteMapping("/deleteUser")
     @ResponseBody
-    public String deleteUser(@RequestParam(value = "id") Long id, @RequestParam(value = "token") Long token) {
+    public String deleteUser(@RequestParam(value = "id") Long id) {
+        System.out.println("In /delete_user");
+//        String currentPrincipalName = SecurityContextHolder.getContext().getAuthentication().getName();
+//        System.out.println(currentPrincipalName);
         try {
             User u = userRepository.findById(id).get();
-            u.setLastVisit(System.currentTimeMillis());
 //            System.out.println("In /deleteUser" + id + "---" + token + "---" + u.getRegistrationDate());
-            if (u.getRegistrationDate().equals(token)) {
-                userRepository.delete(u);
-                return "true";
-            }
-            return "false";
+            userRepository.delete(u);
+            return "true";
         } catch (Exception ex) {
             System.out.println("/deleteUser exception: " + ex.getMessage());
             return "false";

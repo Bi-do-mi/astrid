@@ -70,4 +70,10 @@ public class CustomUserDetails extends User implements UserDetails {
 
     @Override
     public String getPhoneNumber() { return super.getPhoneNumber(); }
+
+    @Override
+    public String getParkName() { return super.getParkName(); }
+
+    @Override
+    public void setBasePoint(BasePoint basePoint) { super.setBasePoint(basePoint); }
 }

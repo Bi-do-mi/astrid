@@ -2,12 +2,13 @@ package com.bidomi.astrid.Model;
 
 import javax.persistence.*;
 
-@Entity
+@Embeddable
 public class Role {
-    @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    @Column(name = "role_id")
-    private Long id;
+//    @Id
+//    @GeneratedValue(generator = "ID_GENERATOR")
+//    @Column(name = "role_id", columnDefinition = "BIGINT(20) UNSIGNED")
+//    private Long id;
+    @Column(length = 20)
     private String role;
 
     public Role() {
