@@ -6,6 +6,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.boot.web.servlet.support.SpringBootServletInitializer;
 import org.springframework.core.SpringVersion;
+import org.springframework.security.core.SpringSecurityCoreVersion;
 
 @SpringBootApplication
 public class AstridApplication extends SpringBootServletInitializer {
@@ -18,6 +19,7 @@ public class AstridApplication extends SpringBootServletInitializer {
     public static void main(String[] args) {
         SpringApplication.run(AstridApplication.class, args);
         System.out.println("app started");
-        System.out.println("Spring version: " + SpringVersion.getVersion());
+//        System.out.println("Spring version: " + SpringVersion.getVersion()
+//                + "Spring Security version" + SpringSecurityCoreVersion.getVersion());
     }
 }

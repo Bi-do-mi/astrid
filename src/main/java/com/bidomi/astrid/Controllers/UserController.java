@@ -8,8 +8,10 @@ import com.bidomi.astrid.Services.MessageService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationContext;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.bind.annotation.*;
@@ -199,7 +201,7 @@ public class UserController {
         }
     }
 
-    @PreAuthorize("hasAnyRole('USER')")
+//    @PreAuthorize("hasAnyRole('USER')")
     @GetMapping(path = "/")
     public @ResponseBody
     List<com.bidomi.astrid.Model.User> getAll() {
@@ -207,6 +209,7 @@ public class UserController {
 //        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 //        String currentPrincipalName = authentication.getName();
 //        System.out.println("getAll()" + currentPrincipalName);
+        System.out.println(SecurityContextHolder.getContext().getAuthentication().getName());
         return this.userRepository.findAll();
     }
 
