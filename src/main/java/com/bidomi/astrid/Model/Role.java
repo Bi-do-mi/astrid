@@ -1,8 +1,13 @@
 package com.bidomi.astrid.Model;
 
+import lombok.AllArgsConstructor;
+import lombok.NoArgsConstructor;
+
 import javax.persistence.*;
 
 @Embeddable
+@NoArgsConstructor
+@AllArgsConstructor
 public class Role {
 //    @Id
 //    @GeneratedValue(generator = "ID_GENERATOR")
@@ -11,13 +16,6 @@ public class Role {
     @Column(length = 20)
     private String role;
 
-    public Role() {
-    }
-
-    public Role(String role) {
-        this.role = role;
-
-    }
     public String getRole() {
         return role;
     }

@@ -1,6 +1,5 @@
 package com.bidomi.astrid.Model;
 
-import org.apache.coyote.Constants;
 import org.hibernate.annotations.DynamicInsert;
 import org.hibernate.annotations.DynamicUpdate;
 
@@ -15,7 +14,7 @@ import java.util.Collection;
 public class User {
 
     @Id
-    @GeneratedValue (generator = "ID_GENERATOR")
+    @GeneratedValue(generator = "ID_GENERATOR")
     @Column(name = "USER_ID", columnDefinition = "BIGINT(20) UNSIGNED")
     private Long id;
     @Column(nullable = false, length = 255)
@@ -23,24 +22,22 @@ public class User {
     @Column(nullable = false, unique = true, length = 60)
     private String username;
 
-//    @OneToMany(fetch = FetchType.EAGER, cascade = {CascadeType.ALL})
+    //    @OneToMany(fetch = FetchType.EAGER, cascade = {CascadeType.ALL})
 //    @JoinTable(name = "user_role", joinColumns =
 //    @JoinColumn(name = "user_id"), inverseJoinColumns =
 //    @JoinColumn(name = "role_id"))
 //    @Column(nullable = false)
 //    private List<Role> roles;
     @ElementCollection(fetch = FetchType.EAGER)
-    @CollectionTable (name = "ROLE")
+    @CollectionTable(name = "ROLE")
     @org.hibernate.annotations.CollectionId(
             columns = @Column(name = "ROLE_ID"),
             type = @org.hibernate.annotations.Type(type = "long"),
-            generator = "ID_GENERATOR" )
+            generator = "ID_GENERATOR")
     private Collection<Role> roles = new ArrayList<Role>();
 
     @Column(length = 255, nullable = false)
-    private String firstName;
-    @Column(length = 255)
-    private String lastName;
+    private String name;
     private boolean accountNonExpired;
     private boolean accountNonLocked;
     private boolean credentialsNonExpired;
@@ -53,8 +50,6 @@ public class User {
     private String confirmationToken;
     @Column(name = "phone_number", length = 15)
     private String phoneNumber;
-    @Column(name = "park_name", length = 60)
-    private String parkName;
 
     @OneToOne(fetch = FetchType.LAZY,
             cascade = {CascadeType.PERSIST, CascadeType.REMOVE})
@@ -72,8 +67,7 @@ public class User {
         this.id = user.getId();
         this.username = user.getUsername();
         this.password = user.getPassword();
-        this.firstName = user.getUsername();
-        this.lastName = user.getLastName();
+        this.name = user.getName();
         this.roles = user.getRoles();
         this.accountNonExpired = user.isAccountNonExpired();
         this.accountNonLocked = user.isAccountNonLocked();
@@ -82,7 +76,6 @@ public class User {
         this.lastVisit = user.getLastVisit();
         this.confirmationToken = user.getConfirmationToken();
         this.phoneNumber = user.getPhoneNumber();
-        this.parkName = user.getParkName();
         this.basePoint = user.getBasePoint();
     }
 
@@ -123,20 +116,12 @@ public class User {
         return roles;
     }
 
-    public String getFirstName() {
-        return firstName;
+    public String getName() {
+        return name;
     }
 
-    public void setFirstName(String firstName) {
-        this.firstName = firstName;
-    }
-
-    public String getLastName() {
-        return lastName;
-    }
-
-    public void setLastName(String lastName) {
-        this.lastName = lastName;
+    public void setName(String name) {
+        this.name = name;
     }
 
     public String getPassword() {
@@ -195,10 +180,6 @@ public class User {
         this.phoneNumber = phoneNumber;
     }
 
-    public String getParkName() { return parkName; }
-
-    public void setParkName(String parkName) { this.parkName = parkName; }
-
     public BasePoint getBasePoint() { return basePoint; }
 
     public void setBasePoint(BasePoint basePoint) { this.basePoint = basePoint; }
@@ -206,7 +187,7 @@ public class User {
     @Override
     public String toString() {
         return String.format(
-                "User [id=%d, firstName='%s', lastName='%s']",
-                id, firstName, lastName);
+                "User [id=%d, name='%s', EMail='%s']",
+                id, name, username);
     }
 }

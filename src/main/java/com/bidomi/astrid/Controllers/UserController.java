@@ -8,10 +8,8 @@ import com.bidomi.astrid.Services.MessageService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.ApplicationContext;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
-import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.bind.annotation.*;
@@ -146,8 +144,7 @@ public class UserController {
 //            System.out.println("CurrentPrincipalName: " + currentPrincipalName);
             User u = userRepository.findById(user.getId()).get();
             u.setLastVisit(System.currentTimeMillis());
-            u.setFirstName(user.getFirstName());
-            u.setLastName(user.getLastName());
+            u.setName(user.getName());
             u.setPhoneNumber(user.getPhoneNumber());
             u = userRepository.save(u);
             u.setPassword(null);
@@ -198,6 +195,21 @@ public class UserController {
         } catch (Exception ex) {
             System.out.println("/deleteUser exception: " + ex.getMessage());
             return "false";
+        }
+    }
+
+    @PostMapping("/check-auth")
+    public @ResponseBody User checkAuth (){
+        String currentPrincipalName = SecurityContextHolder.getContext().getAuthentication().getName();
+        try {
+            User u = userRepository.findByUsername(currentPrincipalName).get();
+            u.setLastVisit(System.currentTimeMillis());
+            u = userRepository.save(u);
+            u.setPassword(null);
+            return u;
+        } catch (Exception ex) {
+            System.out.println("/check-auth exception: " + ex.getMessage());
+            return null;
         }
     }
 

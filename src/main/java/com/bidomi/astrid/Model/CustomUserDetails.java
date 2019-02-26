@@ -5,9 +5,7 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
-import java.beans.Transient;
 import java.util.Collection;
-import java.util.Date;
 import java.util.stream.Collectors;
 
 public class CustomUserDetails extends User implements UserDetails {
@@ -29,6 +27,9 @@ public class CustomUserDetails extends User implements UserDetails {
     public String getPassword() {
         return super.getPassword();
     }
+
+    @Override
+    public String getName() { return super.getName(); }
 
     @Override
     public String getUsername() {
@@ -70,9 +71,6 @@ public class CustomUserDetails extends User implements UserDetails {
 
     @Override
     public String getPhoneNumber() { return super.getPhoneNumber(); }
-
-    @Override
-    public String getParkName() { return super.getParkName(); }
 
     @Override
     public void setBasePoint(BasePoint basePoint) { super.setBasePoint(basePoint); }
