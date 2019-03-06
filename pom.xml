@@ -8,7 +8,7 @@
     <version>0.0.1-SNAPSHOT</version>
     <packaging>war</packaging>
 
-    <!--<role>astrid</role>-->
+    <!--<pointRole>astrid</pointRole>-->
     <!--<description>Astrid project</description>-->
 
     <parent>
@@ -157,12 +157,12 @@
         </repository>
         <!--<repository>-->
             <!--<id>spring-releases</id>-->
-            <!--<role>Spring Releases</role>-->
+            <!--<pointRole>Spring Releases</pointRole>-->
             <!--<url>https://repo.spring.io/libs-release</url>-->
         <!--</repository>-->
         <!--<repository>-->
         <!--<id>org.jboss.repository.releases</id>-->
-        <!--<role>JBoss Maven Release Repository</role>-->
+        <!--<pointRole>JBoss Maven Release Repository</pointRole>-->
         <!--<url>https://repository.jboss.org/nexus/content/repositories/releases</url>-->
         <!--</repository>-->
     </repositories>
@@ -170,7 +170,7 @@
     <!--<pluginRepositories>-->
     <!--<pluginRepository>-->
     <!--<id>spring-releases</id>-->
-    <!--<role>Spring Releases</role>-->
+    <!--<pointRole>Spring Releases</pointRole>-->
     <!--<url>https://repo.spring.io/libs-release</url>-->
     <!--</pluginRepository>-->
     <!--</pluginRepositories>-->

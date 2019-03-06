@@ -60,6 +60,8 @@ public class User {
             @JoinColumn(name = "POINT_ID"))
     private BasePoint basePoint;
 
+    private Collection<Unit> units = new ArrayList<Unit>();
+
     public User() {
     }
 
@@ -180,9 +182,13 @@ public class User {
         this.phoneNumber = phoneNumber;
     }
 
-    public BasePoint getBasePoint() { return basePoint; }
+    public BasePoint getBasePoint() {
+        return basePoint;
+    }
 
-    public void setBasePoint(BasePoint basePoint) { this.basePoint = basePoint; }
+    public void setBasePoint(BasePoint basePoint) {
+        this.basePoint = basePoint;
+    }
 
     @Override
     public String toString() {

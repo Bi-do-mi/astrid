@@ -1,10 +1,13 @@
 package com.bidomi.astrid.Model;
 
+
 import com.vividsolutions.jts.geom.Point;
+import lombok.Data;
 
 import javax.persistence.*;
 
-@Entity
+@Data
+@Embeddable
 @Table(name = "BASE_POINT")
 public class BasePoint {
     @Id
@@ -12,46 +15,16 @@ public class BasePoint {
     @GeneratedValue (generator = "ID_GENERATOR")
     private Long id;
 
-    private Point point;
+    @Column(name="OUNER_ID", columnDefinition = "BIGINT(20) UNSIGNED")
+    private Long ounerId;
 
-    @OneToOne(fetch = FetchType.LAZY)
-    @JoinTable(name = "USER_BPOINT",
-            joinColumns = @JoinColumn(name = "POINT_ID"),
-            inverseJoinColumns =
-            @JoinColumn(name = "USER_ID", nullable = false, unique = true)
-    )
-    private User userRef;
+    @Column(name="POINT_ROLE", length = 20)
+    private String pointRole;
 
-    public BasePoint() {
-    }
+    @Column(name = "LNG")
+    private Double lng;
 
-    public BasePoint(User userRef) {
-        this.userRef = userRef;
-    }
+    @Column(name = "LAT")
+    private Double lat;
 
-    public BasePoint(User userRef, Point point) {
-        this.point = point;
-        this.userRef = userRef;
-    }
-
-    public Point getPoint() {
-        return point;
-    }
-
-    public void setPoint(Point point) {
-        this.point = point;
-    }
-
-
-    public Long getId() {
-        return id;
-    }
-
-    public User getUserRef() {
-        return userRef;
-    }
-
-    public void setUserRef(User userRef) {
-        this.userRef = userRef;
-    }
 }
