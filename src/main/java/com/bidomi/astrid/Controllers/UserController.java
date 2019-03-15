@@ -50,14 +50,15 @@ public class UserController {
     }
 
     @PostMapping("/sign_up")
-    public void signUp(@RequestBody String usr) {
+    public void signUp(@RequestBody JsonNode userCredentials) {
+//        System.out.println("signUp - user: " + userCredentials);
+        String decodedPassword = new String(Base64.getDecoder().decode(
+                userCredentials.get("password").asText()
+        ));
         User user = new User();
-        try {
-            user = this.mapper.readValue(usr, User.class);
-        } catch (Exception e) {
-            e.getMessage();
-        }
-        user.setPassword(new BCryptPasswordEncoder().encode(user.getPassword()));
+        user.setName(userCredentials.get("name").asText());
+        user.setUsername(userCredentials.get("username").asText());
+        user.setPassword(new BCryptPasswordEncoder().encode(decodedPassword));
         Collection<Role> roles = new ArrayList<Role>();
         roles.add(new Role("USER"));
         user.setRoles(roles);
@@ -85,6 +86,11 @@ public class UserController {
     @ResponseBody
     public String nameCheck(@RequestParam(value = "name") String name) {
         try {
+            try {
+                Thread.sleep(1000);
+            } catch (InterruptedException ex) {
+                Thread.currentThread().interrupt();
+            }
             return userRepository.findByUsername(name).get().getUsername();
         } catch (NoSuchElementException e) {
             return "not found";
@@ -136,7 +142,10 @@ public class UserController {
     //    @PreAuthorize("hasAnyRole('USER')")
     @GetMapping("/sign_in")
     @ResponseBody
-    public User signIn() {
+    public User signIn(@RequestParam(value = "token") String token) {
+        if (token!=null){
+
+        }
         System.out.println("In /sign_in");
         String currentPrincipalName = SecurityContextHolder.getContext().getAuthentication().getName();
         try {
@@ -256,7 +265,7 @@ public class UserController {
     public void dataWatch(@RequestBody String user) {
         try {
             User u = this.mapper.readValue(user, User.class);
-            System.out.println("dataWatch: " + u.getLocation());
+//            System.out.println("dataWatch: " + u.getLocation());
         } catch (Exception e) {
             e.getMessage();
         }

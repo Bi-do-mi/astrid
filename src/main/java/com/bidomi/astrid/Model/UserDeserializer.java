@@ -28,13 +28,16 @@ public class UserDeserializer extends StdDeserializer<User> {
 
     @Override
     public User deserialize(JsonParser parser, DeserializationContext ctxt) {
+        Point<G2D> p = null;
         User user = new User();
         try {
             ObjectMapper mapper = new ObjectMapper();
             ObjectCodec codec = parser.getCodec();
             ObjectNode node = codec.readTree(parser);
-            Point<G2D> p = Geometries.mkPoint(new G2D(node.get("location").get("x").asDouble(),
-            node.get("location").get("y").asDouble()), CoordinateReferenceSystems.WGS84);
+            if (node.get("location").get("x") != null) {
+                p = Geometries.mkPoint(new G2D(node.get("location").get("x").asDouble(),
+                        node.get("location").get("y").asDouble()), CoordinateReferenceSystems.WGS84);
+            }
             node.remove("location");
             user = mapper.treeToValue(node, User.class);
             user.setLocation(p);

@@ -17,7 +17,7 @@ public class User {
     @Id
     @GeneratedValue(generator = "ID_GENERATOR")
 //    @Column(name = "user_id", columnDefinition = "BIGINT(20) UNSIGNED")
-    @Column(name = "user_id")
+    @Column(name = "id")
     private Long id;
     @Column(nullable = false, length = 255)
     private String password;
@@ -41,10 +41,10 @@ public class User {
 
     @Column(length = 255, nullable = false)
     private String name;
-    private boolean accountNonExpired;
-    private boolean accountNonLocked;
-    private boolean credentialsNonExpired;
-    private boolean enabled;
+    private boolean accountNonExpired = true;
+    private boolean accountNonLocked = true;
+    private boolean credentialsNonExpired = true;
+    private boolean enabled = true;
 //    @Column(name = "registration_date", columnDefinition = "BIGINT(20) UNSIGNED")
     @Column(name = "registration_date")
     private Long registrationDate;
@@ -191,20 +191,20 @@ public class User {
     @Override
     public String toString() {
         return "User{" +
-                "id=" + id +
-                ", password='" + password + '\'' +
-                ", username='" + username + '\'' +
-                ", roles=" + roles +
-                ", name='" + name + '\'' +
-                ", accountNonExpired=" + accountNonExpired +
-                ", accountNonLocked=" + accountNonLocked +
-                ", credentialsNonExpired=" + credentialsNonExpired +
-                ", enabled=" + enabled +
-                ", registrationDate=" + registrationDate +
-                ", lastVisit=" + lastVisit +
-                ", confirmationToken='" + confirmationToken + '\'' +
-                ", phoneNumber='" + phoneNumber + '\'' +
-                ", location=" + location +
+                "\nid=" + id +
+                ", \npassword='" + password + '\'' +
+                ", \nusername='" + username + '\'' +
+                ", \nroles=" + roles +
+                ", \nname='" + name + '\'' +
+                ", \naccountNonExpired=" + accountNonExpired +
+                ", \naccountNonLocked=" + accountNonLocked +
+                ", \ncredentialsNonExpired=" + credentialsNonExpired +
+                ", \nenabled=" + enabled +
+                ", \nregistrationDate=" + registrationDate +
+                ", \nlastVisit=" + lastVisit +
+                ", \nconfirmationToken='" + confirmationToken + '\'' +
+                ", \nphoneNumber='" + phoneNumber + '\'' +
+                ", \nlocation=" + location +
                 '}';
     }
 }
