@@ -1,5 +1,6 @@
 package com.bidomi.astrid.Model;
 
+import org.geolatte.geom.Point;
 import org.hibernate.annotations.DynamicInsert;
 import org.hibernate.annotations.DynamicUpdate;
 
@@ -8,30 +9,32 @@ import java.util.ArrayList;
 import java.util.Collection;
 
 @Entity
-@Table(name = "USERS")
+@Table(name = "users")
 @DynamicInsert
 @DynamicUpdate
 public class User {
 
     @Id
     @GeneratedValue(generator = "ID_GENERATOR")
-    @Column(name = "USER_ID", columnDefinition = "BIGINT(20) UNSIGNED")
+//    @Column(name = "user_id", columnDefinition = "BIGINT(20) UNSIGNED")
+    @Column(name = "user_id")
     private Long id;
     @Column(nullable = false, length = 255)
     private String password;
     @Column(nullable = false, unique = true, length = 60)
     private String username;
 
-    //    @OneToMany(fetch = FetchType.EAGER, cascade = {CascadeType.ALL})
+//    @OneToMany(fetch = FetchType.EAGER, cascade = {CascadeType.ALL})
 //    @JoinTable(name = "user_role", joinColumns =
 //    @JoinColumn(name = "user_id"), inverseJoinColumns =
 //    @JoinColumn(name = "role_id"))
 //    @Column(nullable = false)
-//    private List<Role> roles;
+//    private Collection<Role> roles;
+
     @ElementCollection(fetch = FetchType.EAGER)
-    @CollectionTable(name = "ROLE")
+    @CollectionTable(name = "role")
     @org.hibernate.annotations.CollectionId(
-            columns = @Column(name = "ROLE_ID"),
+            columns = @Column(name = "role_id"),
             type = @org.hibernate.annotations.Type(type = "long"),
             generator = "ID_GENERATOR")
     private Collection<Role> roles = new ArrayList<Role>();
@@ -42,25 +45,20 @@ public class User {
     private boolean accountNonLocked;
     private boolean credentialsNonExpired;
     private boolean enabled;
-    @Column(name = "registration_date", columnDefinition = "BIGINT(20) UNSIGNED")
+//    @Column(name = "registration_date", columnDefinition = "BIGINT(20) UNSIGNED")
+    @Column(name = "registration_date")
     private Long registrationDate;
-    @Column(name = "last_visit", columnDefinition = "BIGINT(20) UNSIGNED")
+//    @Column(name = "last_visit", columnDefinition = "BIGINT(20) UNSIGNED")
+    @Column(name = "last_visit")
     private Long lastVisit;
     @Column(name = "confirmation_token", length = 255)
     private String confirmationToken;
     @Column(name = "phone_number", length = 15)
     private String phoneNumber;
 
-    @OneToOne(fetch = FetchType.LAZY,
-            cascade = {CascadeType.PERSIST, CascadeType.REMOVE})
-    @JoinTable(name = "USER_BPOINT",
-            joinColumns = @JoinColumn(name = "USER_ID",
-                    nullable = false, unique = true),
-            inverseJoinColumns =
-            @JoinColumn(name = "POINT_ID"))
-    private BasePoint basePoint;
+    private Point location;
 
-    private Collection<Unit> units = new ArrayList<Unit>();
+//    private Collection<Unit> units = new ArrayList<Unit>();
 
     public User() {
     }
@@ -78,7 +76,7 @@ public class User {
         this.lastVisit = user.getLastVisit();
         this.confirmationToken = user.getConfirmationToken();
         this.phoneNumber = user.getPhoneNumber();
-        this.basePoint = user.getBasePoint();
+        this.location = user.getLocation();
     }
 
 
@@ -182,18 +180,31 @@ public class User {
         this.phoneNumber = phoneNumber;
     }
 
-    public BasePoint getBasePoint() {
-        return basePoint;
+    public Point getLocation() {
+        return location;
     }
 
-    public void setBasePoint(BasePoint basePoint) {
-        this.basePoint = basePoint;
+    public void setLocation(Point location) {
+        this.location = location;
     }
 
     @Override
     public String toString() {
-        return String.format(
-                "User [id=%d, name='%s', EMail='%s']",
-                id, name, username);
+        return "User{" +
+                "id=" + id +
+                ", password='" + password + '\'' +
+                ", username='" + username + '\'' +
+                ", roles=" + roles +
+                ", name='" + name + '\'' +
+                ", accountNonExpired=" + accountNonExpired +
+                ", accountNonLocked=" + accountNonLocked +
+                ", credentialsNonExpired=" + credentialsNonExpired +
+                ", enabled=" + enabled +
+                ", registrationDate=" + registrationDate +
+                ", lastVisit=" + lastVisit +
+                ", confirmationToken='" + confirmationToken + '\'' +
+                ", phoneNumber='" + phoneNumber + '\'' +
+                ", location=" + location +
+                '}';
     }
 }

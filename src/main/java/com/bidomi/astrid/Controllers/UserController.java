@@ -2,9 +2,19 @@ package com.bidomi.astrid.Controllers;
 
 import com.bidomi.astrid.Model.Role;
 import com.bidomi.astrid.Model.User;
+import com.bidomi.astrid.Model.UserDeserializer;
 import com.bidomi.astrid.Repositories.UserRepository;
 import com.bidomi.astrid.Services.EmailService;
 import com.bidomi.astrid.Services.MessageService;
+import com.fasterxml.jackson.core.Version;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.module.SimpleModule;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.vividsolutions.jts.geom.Coordinate;
+import com.vividsolutions.jts.geom.GeometryFactory;
+import org.geolatte.geom.Point;
+import org.geolatte.geom.jts.JTS;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,36 +35,46 @@ public class UserController {
     private static final Logger log = LoggerFactory.getLogger(UserController.class);
     @Autowired
     private EmailService emailService;
-
     private UserRepository userRepository;
     private MessageService messageService;
+    ObjectMapper mapper = new ObjectMapper();
+    SimpleModule module = new SimpleModule("UserDeserializer",
+            new Version(1, 0, 0, null, null, null));
+
 
     public UserController(UserRepository userRepository, MessageService messageService) {
         this.userRepository = userRepository;
         this.messageService = messageService;
+        this.module.addDeserializer(User.class, new UserDeserializer());
+        this.mapper.registerModule(module);
     }
 
     @PostMapping("/sign_up")
-    public void signUp(@RequestBody User user) {
+    public void signUp(@RequestBody String usr) {
+        User user = new User();
+        try {
+            user = this.mapper.readValue(usr, User.class);
+        } catch (Exception e) {
+            e.getMessage();
+        }
         user.setPassword(new BCryptPasswordEncoder().encode(user.getPassword()));
-        List<Role> roles = new ArrayList<Role>();
+        Collection<Role> roles = new ArrayList<Role>();
         roles.add(new Role("USER"));
         user.setRoles(roles);
         user.setRegistrationDate(System.currentTimeMillis());
         user.setLastVisit(System.currentTimeMillis());
         user.setEnabled(false);
         user.setConfirmationToken(UUID.randomUUID().toString());
-
-        String message = "<p>Вы зарегистрировались на сайте \"Астрид\".\n" +
-                "\n" +
-                "Для завершения регистрации, пожалуйста, подтвердите ваш электронный адрес:\n</p>" +
-                "<a href='http://localhost:4200/preload/login?token=" + user.getConfirmationToken() + "&target=enable_user'>" +
-                "http://localhost:4200/login\n</a>" +
-                "<p>Если вы не регистрировались на сайте \"Астрид\" — просто проигнорируйте это письмо.\n</p>";
-
-        emailService.sendMail("noreplay", user.getUsername(), "Астрид. Регистрация.", message);
         try {
             userRepository.save(user);
+            String message = "<p>Вы зарегистрировались на сайте \"Астрид\".\n" +
+                    "\n" +
+                    "Для завершения регистрации, пожалуйста, подтвердите ваш электронный адрес:\n</p>" +
+                    "<a href='http://localhost:4200/preload/login?token=" + user.getConfirmationToken() + "&target=enable_user'>" +
+                    "http://localhost:4200/login\n</a>" +
+                    "<p>Если вы не регистрировались на сайте \"Астрид\" — просто проигнорируйте это письмо.\n</p>";
+
+            emailService.sendMail("noreplay", user.getUsername(), "Астрид. Регистрация.", message);
         } catch (Exception e) {
             log.error(e.getMessage());
             throw (e);
@@ -135,12 +155,18 @@ public class UserController {
 
     @PutMapping("/update_user")
     @ResponseBody
-    public User updateUser(@RequestBody User user) {
+    public User updateUser(@RequestBody String usr) {
+        User user = new User();
+        try {
+            user = this.mapper.readValue(usr, User.class);
+        } catch (Exception e) {
+            e.getMessage();
+        }
         System.out.println("In /update_user");
 //        String currentPrincipalName = SecurityContextHolder.getContext().getAuthentication().getName();
 //        System.out.println(currentPrincipalName);
+        System.out.println("Incoming User : " + user);
         try {
-//            System.out.println("Incoming User: " + userRef);
 //            System.out.println("CurrentPrincipalName: " + currentPrincipalName);
             User u = userRepository.findById(user.getId()).get();
             u.setLastVisit(System.currentTimeMillis());
@@ -199,7 +225,8 @@ public class UserController {
     }
 
     @PostMapping("/check-auth")
-    public @ResponseBody User checkAuth (){
+    public @ResponseBody
+    User checkAuth() {
         String currentPrincipalName = SecurityContextHolder.getContext().getAuthentication().getName();
         try {
             User u = userRepository.findByUsername(currentPrincipalName).get();
@@ -213,7 +240,7 @@ public class UserController {
         }
     }
 
-//    @PreAuthorize("hasAnyRole('USER')")
+    //    @PreAuthorize("hasAnyRole('USER')")
     @GetMapping(path = "/")
     public @ResponseBody
     List<com.bidomi.astrid.Model.User> getAll() {
@@ -223,6 +250,25 @@ public class UserController {
 //        System.out.println("getAll()" + currentPrincipalName);
         System.out.println(SecurityContextHolder.getContext().getAuthentication().getName());
         return this.userRepository.findAll();
+    }
+
+    @PutMapping(path = "/data_watch")
+    public void dataWatch(@RequestBody String user) {
+        try {
+            User u = this.mapper.readValue(user, User.class);
+            System.out.println("dataWatch: " + u.getLocation());
+        } catch (Exception e) {
+            e.getMessage();
+        }
+
+//        try {
+////            Point point = (Point) Wkt.fromWkt(user.get("location").toString());
+//            System.out.println("\n dataWatch - Point: " + u.getLocation());
+////            String s = user.get("location").toString();
+////            System.out.printf("dataWatch - Point: " + s);
+//        } catch (Exception e) {
+//            System.out.println(e.getMessage()); ;
+//        }
     }
 
 //    @PreAuthorize("hasAnyRole('USER')")

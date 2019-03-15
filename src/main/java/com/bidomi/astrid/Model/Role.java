@@ -6,15 +6,21 @@ import lombok.NoArgsConstructor;
 import javax.persistence.*;
 
 @Embeddable
-@NoArgsConstructor
-@AllArgsConstructor
+@Table(name = "roles")
 public class Role {
 //    @Id
 //    @GeneratedValue(generator = "ID_GENERATOR")
+//    @Column(name = "role_id")
 //    @Column(name = "role_id", columnDefinition = "BIGINT(20) UNSIGNED")
 //    private Long id;
-    @Column(length = 20)
     private String role;
+
+    public Role() {
+    }
+
+    public Role(String role) {
+        this.role = role;
+    }
 
     public String getRole() {
         return role;
