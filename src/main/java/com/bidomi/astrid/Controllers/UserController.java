@@ -220,7 +220,7 @@ public class UserController {
             u.setLastVisit(System.currentTimeMillis());
             u = userRepository.save(u);
             u.setPassword(null);
-            System.out.println("U: " + u);
+//            System.out.println("U: " + u);
             return u;
         } catch (Exception ex) {
             System.out.println("/check-auth exception: " + ex.getMessage());
@@ -242,7 +242,7 @@ public class UserController {
 
     @PutMapping(path = "/data_watch")
     public void dataWatch(@RequestBody User usr) {
-//        System.out.println("string usr: " + usr);
+        System.out.println("string usr: " + usr);
         try {
             String currentPrincipalName = SecurityContextHolder.getContext().getAuthentication().getName();
             User user = userRepository.findByUsername(currentPrincipalName).get();
@@ -254,15 +254,6 @@ public class UserController {
         } catch (Exception e) {
             e.getMessage();
         }
-//        return null;
-//        try {
-////            Point point = (Point) Wkt.fromWkt(user.get("location").toString());
-//            System.out.println("\n dataWatch - Point: " + u.getLocation());
-////            String s = user.get("location").toString();
-////            System.out.printf("dataWatch - Point: " + s);
-//        } catch (Exception e) {
-//            System.out.println(e.getMessage()); ;
-//        }
     }
 
 //    @PreAuthorize("hasAnyRole('USER')")

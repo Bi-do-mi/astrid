@@ -36,6 +36,6 @@ public class VividPointToJson extends StdConverter<Point, String> {
             System.out.println("From VividPointToJson: " + result);
             return result;
         }
-        return result;
+        return null;
     }
 }

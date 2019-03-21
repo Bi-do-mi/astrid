@@ -63,7 +63,6 @@ public class User implements Serializable {
     @Column(name = "phone_number", length = 15)
     private String phoneNumber;
     @JsonSerialize(converter = VividPointToJson.class)
-//    @JsonDeserialize(contentUsing = GeometryDeserializer.class)
     @JsonDeserialize(converter = JsonPointToVivid.class)
     private Geometry location;
 

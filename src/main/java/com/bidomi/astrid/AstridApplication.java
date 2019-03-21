@@ -10,12 +10,6 @@ import org.springframework.context.annotation.Bean;
 @SpringBootApplication
 public class AstridApplication extends SpringBootServletInitializer {
 
-    @Bean
-    public JtsModule jtsModule()
-    {
-        return new JtsModule();
-    }
-
     @Override
     protected SpringApplicationBuilder configure(SpringApplicationBuilder application) {
         return application.sources(AstridApplication.class);
