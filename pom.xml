@@ -89,17 +89,10 @@
             <!--<version>5.4.1.Final</version>-->
         </dependency>
         <dependency>
-            <groupId>com.fasterxml.jackson.core</groupId>
-            <artifactId>jackson-databind</artifactId>
-            <version>2.9.6</version>
+            <groupId>com.bedatadriven</groupId>
+            <artifactId>jackson-datatype-jts</artifactId>
+            <version>2.4</version>
         </dependency>
-        <!-- https://mvnrepository.com/artifact/org.geolatte/geolatte-common -->
-        <dependency>
-            <groupId>org.geolatte</groupId>
-            <artifactId>geolatte-common</artifactId>
-            <version>0.8</version>
-        </dependency>
-
     </dependencies>
 
     <dependencyManagement>

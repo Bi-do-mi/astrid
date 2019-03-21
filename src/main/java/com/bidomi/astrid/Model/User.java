@@ -1,10 +1,17 @@
 package com.bidomi.astrid.Model;
 
-import org.geolatte.geom.Point;
+import com.bedatadriven.jackson.datatype.jts.serialization.GeometryDeserializer;
+import com.bidomi.astrid.Converters.JsonPointToVivid;
+import com.bidomi.astrid.Converters.VividPointToJson;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.vividsolutions.jts.geom.Geometry;
+import com.vividsolutions.jts.geom.Point;
 import org.hibernate.annotations.DynamicInsert;
 import org.hibernate.annotations.DynamicUpdate;
 
 import javax.persistence.*;
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
 
@@ -12,7 +19,7 @@ import java.util.Collection;
 @Table(name = "users")
 @DynamicInsert
 @DynamicUpdate
-public class User {
+public class User implements Serializable {
 
     @Id
     @GeneratedValue(generator = "ID_GENERATOR")
@@ -45,18 +52,20 @@ public class User {
     private boolean accountNonLocked = true;
     private boolean credentialsNonExpired = true;
     private boolean enabled = true;
-//    @Column(name = "registration_date", columnDefinition = "BIGINT(20) UNSIGNED")
+    //    @Column(name = "registration_date", columnDefinition = "BIGINT(20) UNSIGNED")
     @Column(name = "registration_date")
     private Long registrationDate;
-//    @Column(name = "last_visit", columnDefinition = "BIGINT(20) UNSIGNED")
+    //    @Column(name = "last_visit", columnDefinition = "BIGINT(20) UNSIGNED")
     @Column(name = "last_visit")
     private Long lastVisit;
     @Column(name = "confirmation_token", length = 255)
     private String confirmationToken;
     @Column(name = "phone_number", length = 15)
     private String phoneNumber;
-
-    private Point location;
+    @JsonSerialize(converter = VividPointToJson.class)
+//    @JsonDeserialize(contentUsing = GeometryDeserializer.class)
+    @JsonDeserialize(converter = JsonPointToVivid.class)
+    private Geometry location;
 
 //    private Collection<Unit> units = new ArrayList<Unit>();
 
@@ -180,11 +189,11 @@ public class User {
         this.phoneNumber = phoneNumber;
     }
 
-    public Point getLocation() {
+    public Geometry getLocation() {
         return location;
     }
 
-    public void setLocation(Point location) {
+    public void setLocation(Geometry location) {
         this.location = location;
     }
 

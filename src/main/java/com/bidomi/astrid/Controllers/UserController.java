@@ -2,19 +2,10 @@ package com.bidomi.astrid.Controllers;
 
 import com.bidomi.astrid.Model.Role;
 import com.bidomi.astrid.Model.User;
-import com.bidomi.astrid.Model.UserDeserializer;
 import com.bidomi.astrid.Repositories.UserRepository;
 import com.bidomi.astrid.Services.EmailService;
 import com.bidomi.astrid.Services.MessageService;
-import com.fasterxml.jackson.core.Version;
 import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.module.SimpleModule;
-import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.vividsolutions.jts.geom.Coordinate;
-import com.vividsolutions.jts.geom.GeometryFactory;
-import org.geolatte.geom.Point;
-import org.geolatte.geom.jts.JTS;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,6 +15,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
+import javax.annotation.security.PermitAll;
 import java.util.*;
 
 
@@ -37,16 +29,10 @@ public class UserController {
     private EmailService emailService;
     private UserRepository userRepository;
     private MessageService messageService;
-    ObjectMapper mapper = new ObjectMapper();
-    SimpleModule module = new SimpleModule("UserDeserializer",
-            new Version(1, 0, 0, null, null, null));
-
 
     public UserController(UserRepository userRepository, MessageService messageService) {
         this.userRepository = userRepository;
         this.messageService = messageService;
-        this.module.addDeserializer(User.class, new UserDeserializer());
-        this.mapper.registerModule(module);
     }
 
     @PostMapping("/sign_up")
@@ -143,9 +129,6 @@ public class UserController {
     @GetMapping("/sign_in")
     @ResponseBody
     public User signIn(@RequestParam(value = "token") String token) {
-        if (token!=null){
-
-        }
         System.out.println("In /sign_in");
         String currentPrincipalName = SecurityContextHolder.getContext().getAuthentication().getName();
         try {
@@ -153,7 +136,7 @@ public class UserController {
             u.setLastVisit(System.currentTimeMillis());
             u = userRepository.save(u);
             u.setPassword(null);
-//            log.info(u.getLastVisit().toString());
+//            log.info(u.toString());
             return u;
         } catch (Exception ex) {
             System.out.println("/sign_in exception: " + ex.getMessage());
@@ -164,23 +147,18 @@ public class UserController {
 
     @PutMapping("/update_user")
     @ResponseBody
-    public User updateUser(@RequestBody String usr) {
-        User user = new User();
-        try {
-            user = this.mapper.readValue(usr, User.class);
-        } catch (Exception e) {
-            e.getMessage();
-        }
+    public User updateUser(@RequestBody User user) {
         System.out.println("In /update_user");
 //        String currentPrincipalName = SecurityContextHolder.getContext().getAuthentication().getName();
 //        System.out.println(currentPrincipalName);
-        System.out.println("Incoming User : " + user);
+//        System.out.println("Incoming User : " + user);
         try {
 //            System.out.println("CurrentPrincipalName: " + currentPrincipalName);
             User u = userRepository.findById(user.getId()).get();
             u.setLastVisit(System.currentTimeMillis());
             u.setName(user.getName());
             u.setPhoneNumber(user.getPhoneNumber());
+            u.setLocation(user.getLocation());
             u = userRepository.save(u);
             u.setPassword(null);
             return u;
@@ -233,7 +211,7 @@ public class UserController {
         }
     }
 
-    @PostMapping("/check-auth")
+    @GetMapping("/check-auth")
     public @ResponseBody
     User checkAuth() {
         String currentPrincipalName = SecurityContextHolder.getContext().getAuthentication().getName();
@@ -242,6 +220,7 @@ public class UserController {
             u.setLastVisit(System.currentTimeMillis());
             u = userRepository.save(u);
             u.setPassword(null);
+            System.out.println("U: " + u);
             return u;
         } catch (Exception ex) {
             System.out.println("/check-auth exception: " + ex.getMessage());
@@ -250,26 +229,32 @@ public class UserController {
     }
 
     //    @PreAuthorize("hasAnyRole('USER')")
-    @GetMapping(path = "/")
+    @GetMapping(path = "/all")
     public @ResponseBody
-    List<com.bidomi.astrid.Model.User> getAll() {
+    User getAll() {
 //        System.out.println(messageService.getMessage());
 //        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 //        String currentPrincipalName = authentication.getName();
 //        System.out.println("getAll()" + currentPrincipalName);
         System.out.println(SecurityContextHolder.getContext().getAuthentication().getName());
-        return this.userRepository.findAll();
+        return this.userRepository.findAll().get(0);
     }
 
     @PutMapping(path = "/data_watch")
-    public void dataWatch(@RequestBody String user) {
+    public void dataWatch(@RequestBody User usr) {
+//        System.out.println("string usr: " + usr);
         try {
-            User u = this.mapper.readValue(user, User.class);
-//            System.out.println("dataWatch: " + u.getLocation());
+            String currentPrincipalName = SecurityContextHolder.getContext().getAuthentication().getName();
+            User user = userRepository.findByUsername(currentPrincipalName).get();
+            user.setLastVisit(System.currentTimeMillis());
+            user.setLocation(usr.getLocation());
+            user = userRepository.save(user);
+            user.setPassword(null);
+//            return user;
         } catch (Exception e) {
             e.getMessage();
         }
-
+//        return null;
 //        try {
 ////            Point point = (Point) Wkt.fromWkt(user.get("location").toString());
 //            System.out.println("\n dataWatch - Point: " + u.getLocation());

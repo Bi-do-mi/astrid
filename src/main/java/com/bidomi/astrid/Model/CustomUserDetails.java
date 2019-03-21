@@ -1,7 +1,8 @@
 package com.bidomi.astrid.Model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import org.geolatte.geom.Point;
+import com.vividsolutions.jts.geom.Geometry;
+import com.vividsolutions.jts.geom.Point;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -74,5 +75,5 @@ public class CustomUserDetails extends User implements UserDetails {
     public String getPhoneNumber() { return super.getPhoneNumber(); }
 
     @Override
-    public Point getLocation() {return super.getLocation();}
+    public Geometry getLocation() {return super.getLocation();}
 }

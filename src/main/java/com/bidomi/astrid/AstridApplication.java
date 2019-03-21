@@ -1,16 +1,20 @@
 package com.bidomi.astrid;
 
-import org.hibernate.spatial.HibernateSpatialConfigurationSettings;
+import com.bedatadriven.jackson.datatype.jts.JtsModule;
 import org.springframework.boot.SpringApplication;
-import org.springframework.boot.SpringBootExceptionReporter;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.boot.web.servlet.support.SpringBootServletInitializer;
-import org.springframework.core.SpringVersion;
-import org.springframework.security.core.SpringSecurityCoreVersion;
+import org.springframework.context.annotation.Bean;
 
 @SpringBootApplication
 public class AstridApplication extends SpringBootServletInitializer {
+
+    @Bean
+    public JtsModule jtsModule()
+    {
+        return new JtsModule();
+    }
 
     @Override
     protected SpringApplicationBuilder configure(SpringApplicationBuilder application) {
