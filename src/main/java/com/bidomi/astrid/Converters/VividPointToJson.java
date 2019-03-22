@@ -33,7 +33,7 @@ public class VividPointToJson extends StdConverter<Point, String> {
             } catch (JsonProcessingException e) {
                 e.printStackTrace();
             }
-            System.out.println("From VividPointToJson: " + result);
+//            System.out.println("From VividPointToJson: " + result);
             return result;
         }
         return null;

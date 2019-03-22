@@ -135,7 +135,6 @@ public class UserController {
             User u = userRepository.findByUsername(currentPrincipalName).get();
             u.setLastVisit(System.currentTimeMillis());
             u = userRepository.save(u);
-            u.setPassword(null);
 //            log.info(u.toString());
             return u;
         } catch (Exception ex) {
@@ -160,7 +159,6 @@ public class UserController {
             u.setPhoneNumber(user.getPhoneNumber());
             u.setLocation(user.getLocation());
             u = userRepository.save(u);
-            u.setPassword(null);
             return u;
         } catch (Exception ex) {
             System.out.println("/update_user exception: " + ex.getMessage());
@@ -183,7 +181,6 @@ public class UserController {
                 emailService.sendMail("noreplay", u.getUsername(), "Астрид. Смена пароля.",
                         "Пароль был изменен.");
                 u = userRepository.save(u);
-                u.setPassword(null);
                 return "true";
             }
             return "false";
@@ -202,9 +199,13 @@ public class UserController {
 //        System.out.println(currentPrincipalName);
         try {
             User u = userRepository.findById(id).get();
-//            System.out.println("In /deleteUser" + id + "---" + token + "---" + u.getRegistrationDate());
-            userRepository.delete(u);
-            return "true";
+            String currentPrincipalName = SecurityContextHolder.getContext().getAuthentication().getName();
+            System.out.println("In /deleteUser" + id + "---" + " principal name " + currentPrincipalName + u.getUsername());
+            if (currentPrincipalName.equals(u.getUsername())) {
+                userRepository.delete(u);
+                return "true";
+            }
+            return "false";
         } catch (Exception ex) {
             System.out.println("/deleteUser exception: " + ex.getMessage());
             return "false";
@@ -219,7 +220,6 @@ public class UserController {
             User u = userRepository.findByUsername(currentPrincipalName).get();
             u.setLastVisit(System.currentTimeMillis());
             u = userRepository.save(u);
-            u.setPassword(null);
 //            System.out.println("U: " + u);
             return u;
         } catch (Exception ex) {
@@ -249,7 +249,6 @@ public class UserController {
             user.setLastVisit(System.currentTimeMillis());
             user.setLocation(usr.getLocation());
             user = userRepository.save(user);
-            user.setPassword(null);
 //            return user;
         } catch (Exception e) {
             e.getMessage();

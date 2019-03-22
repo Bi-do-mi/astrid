@@ -2,7 +2,10 @@ package com.bidomi.astrid.Model;
 
 import com.bedatadriven.jackson.datatype.jts.serialization.GeometryDeserializer;
 import com.bidomi.astrid.Converters.JsonPointToVivid;
+import com.bidomi.astrid.Converters.PasswordToNull;
 import com.bidomi.astrid.Converters.VividPointToJson;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonValue;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.vividsolutions.jts.geom.Geometry;
@@ -26,6 +29,7 @@ public class User implements Serializable {
 //    @Column(name = "user_id", columnDefinition = "BIGINT(20) UNSIGNED")
     @Column(name = "id")
     private Long id;
+    @JsonSerialize(converter = PasswordToNull.class)
     @Column(nullable = false, length = 255)
     private String password;
     @Column(nullable = false, unique = true, length = 60)
