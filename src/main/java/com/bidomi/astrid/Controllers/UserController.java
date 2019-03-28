@@ -6,16 +6,19 @@ import com.bidomi.astrid.Repositories.UserRepository;
 import com.bidomi.astrid.Services.EmailService;
 import com.bidomi.astrid.Services.MessageService;
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
+import org.joda.time.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
-import javax.annotation.security.PermitAll;
 import java.util.*;
 
 
@@ -48,8 +51,8 @@ public class UserController {
         Collection<Role> roles = new ArrayList<Role>();
         roles.add(new Role("USER"));
         user.setRoles(roles);
-        user.setRegistrationDate(System.currentTimeMillis());
-        user.setLastVisit(System.currentTimeMillis());
+        user.setRegistrationDate(DateTime.now());
+        user.setLastVisit(DateTime.now());
         user.setEnabled(false);
         user.setConfirmationToken(UUID.randomUUID().toString());
         try {
@@ -133,7 +136,7 @@ public class UserController {
         String currentPrincipalName = SecurityContextHolder.getContext().getAuthentication().getName();
         try {
             User u = userRepository.findByUsername(currentPrincipalName).get();
-            u.setLastVisit(System.currentTimeMillis());
+            u.setLastVisit(DateTime.now());
             u = userRepository.save(u);
 //            log.info(u.toString());
             return u;
@@ -150,14 +153,16 @@ public class UserController {
         System.out.println("In /update_user");
 //        String currentPrincipalName = SecurityContextHolder.getContext().getAuthentication().getName();
 //        System.out.println(currentPrincipalName);
-//        System.out.println("Incoming User : " + user);
+        System.out.println("Incoming User : " + user);
         try {
 //            System.out.println("CurrentPrincipalName: " + currentPrincipalName);
-            User u = userRepository.findById(user.getId()).get();
-            u.setLastVisit(System.currentTimeMillis());
+            User u = userRepository.findByUsername(SecurityContextHolder.getContext().getAuthentication().getName()).get();
+            u.setLastVisit(DateTime.now());
             u.setName(user.getName());
             u.setPhoneNumber(user.getPhoneNumber());
             u.setLocation(user.getLocation());
+            System.out.println("In /update_user" + user.getLocation() + "\n"
+            + u.getLocation());
             u = userRepository.save(u);
             return u;
         } catch (Exception ex) {
@@ -218,9 +223,8 @@ public class UserController {
         String currentPrincipalName = SecurityContextHolder.getContext().getAuthentication().getName();
         try {
             User u = userRepository.findByUsername(currentPrincipalName).get();
-            u.setLastVisit(System.currentTimeMillis());
+            u.setLastVisit(DateTime.now());
             u = userRepository.save(u);
-//            System.out.println("U: " + u);
             return u;
         } catch (Exception ex) {
             System.out.println("/check-auth exception: " + ex.getMessage());
@@ -231,28 +235,28 @@ public class UserController {
     //    @PreAuthorize("hasAnyRole('USER')")
     @GetMapping(path = "/all")
     public @ResponseBody
-    User getAll() {
-//        System.out.println(messageService.getMessage());
-//        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-//        String currentPrincipalName = authentication.getName();
+    String getAll() {
+        String currentPrincipalName = SecurityContextHolder.getContext().getAuthentication().getName();
 //        System.out.println("getAll()" + currentPrincipalName);
-        System.out.println(SecurityContextHolder.getContext().getAuthentication().getName());
-        return this.userRepository.findAll().get(0);
+//        return this.userRepository.findByUsername(currentPrincipalName).get();
+        String str = "{\"type\":\"FeatureCollection\",\"features\":[{\"type\":\"Feature\",\"geometry\":{\"type\":\"Point\",\"coordinates\":[37.622504,55.753215]},\"properties\":{\"message\":\"value0\"}}]}";
+        return str;
     }
 
-    @PutMapping(path = "/data_watch")
-    public void dataWatch(@RequestBody User usr) {
-        System.out.println("string usr: " + usr);
+    @PutMapping(path = "/save_location")
+    public @ResponseBody User dataWatch(@RequestBody User usr) {
+//        System.out.println("save_location Incoming User: " + usr);
         try {
             String currentPrincipalName = SecurityContextHolder.getContext().getAuthentication().getName();
             User user = userRepository.findByUsername(currentPrincipalName).get();
-            user.setLastVisit(System.currentTimeMillis());
+            user.setLastVisit(DateTime.now());
             user.setLocation(usr.getLocation());
             user = userRepository.save(user);
-//            return user;
+            return user;
         } catch (Exception e) {
             e.getMessage();
         }
+        return null;
     }
 
 //    @PreAuthorize("hasAnyRole('USER')")

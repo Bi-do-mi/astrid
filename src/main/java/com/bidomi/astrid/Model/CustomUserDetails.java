@@ -2,7 +2,7 @@ package com.bidomi.astrid.Model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.vividsolutions.jts.geom.Geometry;
-import com.vividsolutions.jts.geom.Point;
+import org.joda.time.DateTime;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -59,10 +59,10 @@ public class CustomUserDetails extends User implements UserDetails {
     }
 
     @Override
-    public Long getRegistrationDate() { return super.getRegistrationDate(); }
+    public DateTime getRegistrationDate() { return super.getRegistrationDate(); }
 
     @Override
-    public Long getLastVisit() {
+    public DateTime getLastVisit() {
         return super.getLastVisit();
     }
 

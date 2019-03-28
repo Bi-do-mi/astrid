@@ -55,7 +55,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .logoutRequestMatcher(new AntPathRequestMatcher("/logout"))
                 .and().authorizeRequests()
                 .antMatchers("/index.html", "/rest/users/sign_up", "/rest/users/all",
-                        "/rest/users/name_check", "/home", "/rest/users/enable_user", "/rest/users/data_watch",
+                        "/rest/users/name_check", "/home", "/rest/users/enable_user",
                         "/rest/users/set_user_token", "/rest/users/change_password", "/rest/geo/create-markers"
                 )
                 .permitAll()

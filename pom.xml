@@ -98,6 +98,24 @@
             <artifactId>jts2geojson</artifactId>
             <version>0.12.0</version>
         </dependency>
+        <!-- https://mvnrepository.com/artifact/joda-time/joda-time -->
+        <dependency>
+            <groupId>joda-time</groupId>
+            <artifactId>joda-time</artifactId>
+            <version>2.10.1</version>
+        </dependency>
+        <!-- https://mvnrepository.com/artifact/org.jadira.usertype/usertype.core -->
+        <dependency>
+            <groupId>org.jadira.usertype</groupId>
+            <artifactId>usertype.core</artifactId>
+            <version>6.0.1.GA</version>
+        </dependency>
+        <dependency>
+            <groupId>com.fasterxml.jackson.datatype</groupId>
+            <artifactId>jackson-datatype-joda</artifactId>
+            <version>2.9.5</version>
+        </dependency>
+
     </dependencies>
 
     <dependencyManagement>
@@ -158,15 +176,33 @@
             <url>http://www.hibernatespatial.org/repository</url>
         </repository>
         <!--<repository>-->
-            <!--<id>spring-releases</id>-->
-            <!--<pointRole>Spring Releases</pointRole>-->
-            <!--<url>https://repo.spring.io/libs-release</url>-->
+        <!--<id>spring-releases</id>-->
+        <!--<pointRole>Spring Releases</pointRole>-->
+        <!--<url>https://repo.spring.io/libs-release</url>-->
         <!--</repository>-->
         <!--<repository>-->
         <!--<id>org.jboss.repository.releases</id>-->
         <!--<pointRole>JBoss Maven Release Repository</pointRole>-->
         <!--<url>https://repository.jboss.org/nexus/content/repositories/releases</url>-->
         <!--</repository>-->
+        <repository>
+            <id>maven2-repository.dev.java.net</id>
+            <name>Java.net repository</name>
+            <url>http://download.java.net/maven/2</url>
+        </repository>
+        <repository>
+            <id>osgeo</id>
+            <name>Open Source Geospatial Foundation Repository</name>
+            <url>http://download.osgeo.org/webdav/geotools/</url>
+        </repository>
+        <repository>
+            <snapshots>
+                <enabled>true</enabled>
+            </snapshots>
+            <id>boundless</id>
+            <name>Boundless Maven Repository</name>
+            <url>http://repo.boundlessgeo.com/main</url>
+        </repository>
     </repositories>
 
     <!--<pluginRepositories>-->

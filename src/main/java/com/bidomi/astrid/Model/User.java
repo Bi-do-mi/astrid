@@ -1,19 +1,17 @@
 package com.bidomi.astrid.Model;
 
-import com.bedatadriven.jackson.datatype.jts.serialization.GeometryDeserializer;
 import com.bidomi.astrid.Converters.JsonPointToVivid;
 import com.bidomi.astrid.Converters.PasswordToNull;
 import com.bidomi.astrid.Converters.VividPointToJson;
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonValue;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.vividsolutions.jts.geom.Geometry;
-import com.vividsolutions.jts.geom.Point;
-import org.hibernate.annotations.DynamicInsert;
-import org.hibernate.annotations.DynamicUpdate;
+import org.hibernate.annotations.*;
+import org.joda.time.DateTime;
 
 import javax.persistence.*;
+import javax.persistence.Entity;
+import javax.persistence.Table;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -56,12 +54,12 @@ public class User implements Serializable {
     private boolean accountNonLocked = true;
     private boolean credentialsNonExpired = true;
     private boolean enabled = true;
-    //    @Column(name = "registration_date", columnDefinition = "BIGINT(20) UNSIGNED")
-    @Column(name = "registration_date")
-    private Long registrationDate;
-    //    @Column(name = "last_visit", columnDefinition = "BIGINT(20) UNSIGNED")
-    @Column(name = "last_visit")
-    private Long lastVisit;
+    @Column(name = "registration_date", nullable = false, updatable = false,
+            columnDefinition = "timestamp with time zone")
+    private DateTime registrationDate;
+    @Column(name = "last_visit", nullable = false,
+            columnDefinition = "timestamp with time zone")
+    private DateTime lastVisit;
     @Column(name = "confirmation_token", length = 255)
     private String confirmationToken;
     @Column(name = "phone_number", length = 15)
@@ -160,19 +158,19 @@ public class User implements Serializable {
         return enabled;
     }
 
-    public Long getRegistrationDate() {
+    public DateTime getRegistrationDate() {
         return registrationDate;
     }
 
-    public void setRegistrationDate(Long registrationDate) {
+    public void setRegistrationDate(DateTime registrationDate) {
         this.registrationDate = registrationDate;
     }
 
-    public Long getLastVisit() {
+    public DateTime getLastVisit() {
         return lastVisit;
     }
 
-    public void setLastVisit(Long lastVisit) {
+    public void setLastVisit(DateTime lastVisit) {
         this.lastVisit = lastVisit;
     }
 
