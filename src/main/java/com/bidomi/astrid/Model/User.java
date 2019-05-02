@@ -10,11 +10,14 @@ import org.hibernate.annotations.*;
 import org.joda.time.DateTime;
 
 import javax.persistence.*;
+import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.Table;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashSet;
+import java.util.Set;
 
 @Entity
 @Table(name = "users")
@@ -67,8 +70,9 @@ public class User implements Serializable {
     @JsonSerialize(converter = VividPointToJson.class)
     @JsonDeserialize(converter = JsonPointToVivid.class)
     private Geometry location;
-
-//    private Collection<Unit> units = new ArrayList<Unit>();
+    @OneToMany(mappedBy = "ouner", cascade = CascadeType.ALL,
+    orphanRemoval = true)
+    private Set<Unit> units = new HashSet<>();
 
     public User() {
     }
@@ -196,6 +200,19 @@ public class User implements Serializable {
 
     public void setLocation(Geometry location) {
         this.location = location;
+    }
+
+    public Set<Unit> getUnits() { return units; }
+
+    public void setUnits(Set<Unit> units) { this.units = units; }
+
+    public void addUnit(Unit u){
+        units.add(u);
+        u.setOuner(this);
+    };
+    public void removeUnit(Unit u){
+        units.remove(u);
+        u.setOuner(null);
     }
 
     @Override

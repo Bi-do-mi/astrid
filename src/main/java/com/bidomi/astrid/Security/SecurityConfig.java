@@ -33,6 +33,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     private UserDetailsServiceImpl userDetailsService;
     @Autowired
     private DataSource dataSource;
+    @Autowired
+    private AstridAuthenticationEntryPoint authenticationEntryPoint;
 
     @Override
     protected void configure(AuthenticationManagerBuilder auth) throws Exception {
@@ -47,10 +49,12 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         http
                 .cors()
                 .and()
-//                .csrf().disable()
+                .csrf().disable()
                 .csrf().csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
                 .and()
                 .httpBasic()
+//               disable browser login prompt
+                .authenticationEntryPoint(authenticationEntryPoint)
                 .and().logout().permitAll().deleteCookies("JSESSIONID")
                 .logoutRequestMatcher(new AntPathRequestMatcher("/logout"))
                 .and().authorizeRequests()

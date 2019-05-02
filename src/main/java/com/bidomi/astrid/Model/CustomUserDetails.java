@@ -8,6 +8,7 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.Collection;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 public class CustomUserDetails extends User implements UserDetails {
@@ -22,6 +23,11 @@ public class CustomUserDetails extends User implements UserDetails {
                 .stream()
                 .map(role -> new SimpleGrantedAuthority("ROLE_"+role.getRole()))
                 .collect(Collectors.toList());
+    }
+
+    @Override
+    public Set<Unit> getUnits() {
+        return super.getUnits();
     }
 
     @Override
@@ -76,4 +82,6 @@ public class CustomUserDetails extends User implements UserDetails {
 
     @Override
     public Geometry getLocation() {return super.getLocation();}
+
+
 }

@@ -162,7 +162,7 @@ public class UserController {
             u.setPhoneNumber(user.getPhoneNumber());
             u.setLocation(user.getLocation());
             System.out.println("In /update_user" + user.getLocation() + "\n"
-            + u.getLocation());
+                    + u.getLocation());
             u = userRepository.save(u);
             return u;
         } catch (Exception ex) {
@@ -244,7 +244,8 @@ public class UserController {
     }
 
     @PutMapping(path = "/save_location")
-    public @ResponseBody User dataWatch(@RequestBody User usr) {
+    public @ResponseBody
+    User dataWatch(@RequestBody User usr) {
 //        System.out.println("save_location Incoming User: " + usr);
         try {
             String currentPrincipalName = SecurityContextHolder.getContext().getAuthentication().getName();
@@ -257,6 +258,20 @@ public class UserController {
             e.getMessage();
         }
         return null;
+    }
+
+    @GetMapping(path = "/check_admin")
+    public @ResponseBody
+    boolean checkAdmin() {
+        String currentPrincipalName = SecurityContextHolder.getContext().getAuthentication().getName();
+        User user = userRepository.findByUsername(currentPrincipalName).get();
+        boolean admin = false;
+        for (Role r : user.getRoles()) {
+            if (r.getRole().equals("ADMIN")) {
+                return true;
+            }
+        }
+        return false;
     }
 
 //    @PreAuthorize("hasAnyRole('USER')")
