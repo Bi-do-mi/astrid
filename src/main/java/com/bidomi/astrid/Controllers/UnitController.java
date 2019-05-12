@@ -44,6 +44,9 @@ public class UnitController {
         unitTypesList.forEach((JsonNode ass) -> {
             this.unitTypesRepository.save(new UnitAssignment(ass));
         });
+//        unitTypesList.forEach((JsonNode ass) -> {
+//            System.out.println(ass + "\n");
+//        });
     }
 
     @GetMapping("/get_unit_types_list")

