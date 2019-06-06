@@ -8,11 +8,18 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.vividsolutions.jts.geom.Geometry;
 import lombok.Data;
+import org.hibernate.annotations.DynamicInsert;
+import org.hibernate.annotations.DynamicUpdate;
+import org.joda.time.DateTime;
 
 import javax.persistence.*;
+import java.util.ArrayList;
+import java.util.Collection;
 
 @Data
 @Entity
+@DynamicInsert
+@DynamicUpdate
 public class Unit {
     @Id
     @GeneratedValue(generator = "UNIT_ID_GENERATOR")
@@ -35,6 +42,21 @@ public class Unit {
     private Geometry location;
     private boolean enabled;
     private boolean paid;
+    private boolean testFor;
+    @ElementCollection(fetch = FetchType.EAGER)
+    @CollectionTable(name = "unit_images")
+    @org.hibernate.annotations.CollectionId(
+            columns = @Column(name = "filename_id"),
+            type = @org.hibernate.annotations.Type(type = "long"),
+            generator = "ID_GENERATOR")
+    private Collection<UnitImage> images = new ArrayList<UnitImage>();
+    @Column(name = "created_on", nullable = false, updatable = false,
+            columnDefinition = "timestamp with time zone")
+    private DateTime createdOn;
+    @Column(name = "last_update", nullable = false, updatable = false,
+            columnDefinition = "timestamp with time zone")
+    private DateTime lastUpdate;
+
 
     @Override
     public boolean equals(Object o) {
@@ -45,5 +67,28 @@ public class Unit {
     @Override
     public int hashCode() {
         return 31;
+    }
+    @PreRemove
+    public void removeImages(){
+        System.out.println("removeImages() triggered!");
+    }
+
+    @Override
+    public String toString() {
+        return "\nUnit{" +
+                "\nid=" + id +
+                ", \nouner=" + ouner.getId() +
+                ", \nassignment='" + assignment + '\'' +
+                ", \ntype='" + type + '\'' +
+                ", \nbrand='" + brand + '\'' +
+                ", \nmodel='" + model + '\'' +
+                ", \nlocation=" + location +
+                ", \nenabled=" + enabled +
+                ", \npaid=" + paid +
+                ", \ntestFor=" + testFor +
+                ", \ncreatedOn=" + createdOn +
+                ", \nlastUpdate=" + lastUpdate +
+                ", \nimages=" + images +
+                '}';
     }
 }

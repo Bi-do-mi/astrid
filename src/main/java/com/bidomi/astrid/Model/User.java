@@ -232,6 +232,7 @@ public class User implements Serializable {
                 ", \nconfirmationToken='" + confirmationToken + '\'' +
                 ", \nphoneNumber='" + phoneNumber + '\'' +
                 ", \nlocation=" + location +
+                ", \nunits=" + units +
                 '}';
     }
 }
