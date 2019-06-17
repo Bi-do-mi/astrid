@@ -26,7 +26,7 @@ public class CustomUserDetails extends User implements UserDetails {
     }
 
     @Override
-    public Set<Unit> getUnits() {
+    public Collection<Unit> getUnits() {
         return super.getUnits();
     }
 

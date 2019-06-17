@@ -72,7 +72,7 @@ public class User implements Serializable {
     private Geometry location;
     @OneToMany(mappedBy = "ouner", cascade = CascadeType.ALL,
     orphanRemoval = true)
-    private Set<Unit> units = new HashSet<>();
+    private Collection<Unit> units = new ArrayList<Unit>();
 
     public User() {
     }
@@ -91,6 +91,7 @@ public class User implements Serializable {
         this.confirmationToken = user.getConfirmationToken();
         this.phoneNumber = user.getPhoneNumber();
         this.location = user.getLocation();
+        this.units = user.getUnits();
     }
 
 
@@ -202,9 +203,9 @@ public class User implements Serializable {
         this.location = location;
     }
 
-    public Set<Unit> getUnits() { return units; }
+    public Collection<Unit> getUnits() { return units; }
 
-    public void setUnits(Set<Unit> units) { this.units = units; }
+    public void setUnits(Collection<Unit> units) { this.units = units; }
 
     public void addUnit(Unit u){
         units.add(u);

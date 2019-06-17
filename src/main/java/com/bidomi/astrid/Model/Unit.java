@@ -1,9 +1,6 @@
 package com.bidomi.astrid.Model;
 
-import com.bidomi.astrid.Converters.JsonPointToVivid;
-import com.bidomi.astrid.Converters.UserIdToUser;
-import com.bidomi.astrid.Converters.UserToUserId;
-import com.bidomi.astrid.Converters.VividPointToJson;
+import com.bidomi.astrid.Converters.*;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.vividsolutions.jts.geom.Geometry;
@@ -49,6 +46,7 @@ public class Unit {
             columns = @Column(name = "filename_id"),
             type = @org.hibernate.annotations.Type(type = "long"),
             generator = "ID_GENERATOR")
+    @JsonSerialize(converter = ImageValue.class)
     private Collection<UnitImage> images = new ArrayList<UnitImage>();
     @Column(name = "created_on", nullable = false, updatable = false,
             columnDefinition = "timestamp with time zone")

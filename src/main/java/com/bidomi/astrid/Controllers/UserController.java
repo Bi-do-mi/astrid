@@ -150,10 +150,10 @@ public class UserController {
     @PutMapping("/update_user")
     @ResponseBody
     public User updateUser(@RequestBody User user) {
-        System.out.println("In /update_user");
+//        System.out.println("In /update_user");
 //        String currentPrincipalName = SecurityContextHolder.getContext().getAuthentication().getName();
 //        System.out.println(currentPrincipalName);
-        System.out.println("Incoming User : " + user);
+//        System.out.println("Incoming User : " + user);
         try {
 //            System.out.println("CurrentPrincipalName: " + currentPrincipalName);
             User u = userRepository.findByUsername(SecurityContextHolder.getContext().getAuthentication().getName()).get();
@@ -235,12 +235,12 @@ public class UserController {
     //    @PreAuthorize("hasAnyRole('USER')")
     @GetMapping(path = "/all")
     public @ResponseBody
-    String getAll() {
-        String currentPrincipalName = SecurityContextHolder.getContext().getAuthentication().getName();
+    User getAll() {
+//        String currentPrincipalName = SecurityContextHolder.getContext().getAuthentication().getName();
 //        System.out.println("getAll()" + currentPrincipalName);
-//        return this.userRepository.findByUsername(currentPrincipalName).get();
-        String str = "{\"type\":\"FeatureCollection\",\"features\":[{\"type\":\"Feature\",\"geometry\":{\"type\":\"Point\",\"coordinates\":[37.622504,55.753215]},\"properties\":{\"message\":\"value0\"}}]}";
-        return str;
+        return this.userRepository.findAll().get(0);
+//        String str = "{\"type\":\"FeatureCollection\",\"features\":[{\"type\":\"Feature\",\"geometry\":{\"type\":\"Point\",\"coordinates\":[37.622504,55.753215]},\"properties\":{\"message\":\"value0\"}}]}";
+//        return str;
     }
 
     @PutMapping(path = "/save_location")

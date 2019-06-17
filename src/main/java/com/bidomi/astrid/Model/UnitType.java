@@ -13,7 +13,7 @@ import javax.persistence.*;
         name = "jsonb-node",
         typeClass = JsonNodeBinaryType.class
 )
-public class UnitAssignment {
+public class UnitType {
     @Id
     @GeneratedValue(generator = "UNIT_TYPES_ID_GENERATOR")
     @Column(name = "id")
@@ -21,13 +21,13 @@ public class UnitAssignment {
 
     @Type(type = "jsonb-node")
     @Column(columnDefinition = "jsonb")
-    private JsonNode assignment;
+    private JsonNode unitType;
 
-    public UnitAssignment() {
+    public UnitType() {
     }
 
-    public UnitAssignment(JsonNode assignment) {
-        this.assignment = assignment;
+    public UnitType(JsonNode uType) {
+        this.unitType = uType;
     }
 
     public Long getId() {
@@ -38,11 +38,11 @@ public class UnitAssignment {
         this.id = id;
     }
 
-    public JsonNode getAssignment() {
-        return assignment;
+    public JsonNode getUnitType() {
+        return unitType;
     }
 
-    public void setAssignment(JsonNode assignment) {
-        this.assignment = assignment;
+    public void setUnitType(JsonNode unitType) {
+        this.unitType = unitType;
     }
 }
