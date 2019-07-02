@@ -55,6 +55,109 @@ public class Unit {
             columnDefinition = "timestamp with time zone")
     private DateTime lastUpdate;
 
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public User getOuner() {
+        return ouner;
+    }
+
+    public void setOuner(User ouner) {
+        this.ouner = ouner;
+    }
+
+    public String getAssignment() {
+        return assignment;
+    }
+
+    public void setAssignment(String assignment) {
+        this.assignment = assignment;
+    }
+
+    public String getType() {
+        return type;
+    }
+
+    public void setType(String type) {
+        this.type = type;
+    }
+
+    public String getBrand() {
+        return brand;
+    }
+
+    public void setBrand(String brand) {
+        this.brand = brand;
+    }
+
+    public String getModel() {
+        return model;
+    }
+
+    public void setModel(String model) {
+        this.model = model;
+    }
+
+    public Geometry getLocation() {
+        return location;
+    }
+
+    public void setLocation(Geometry location) {
+        this.location = location;
+    }
+
+    public boolean isEnabled() {
+        return enabled;
+    }
+
+    public void setEnabled(boolean enabled) {
+        this.enabled = enabled;
+    }
+
+    public boolean isPaid() {
+        return paid;
+    }
+
+    public void setPaid(boolean paid) {
+        this.paid = paid;
+    }
+
+    public boolean isTestFor() {
+        return testFor;
+    }
+
+    public void setTestFor(boolean testFor) {
+        this.testFor = testFor;
+    }
+
+    public Collection<UnitImage> getImages() {
+        return images;
+    }
+
+    public void setImages(Collection<UnitImage> images) {
+        this.images = images;
+    }
+
+    public DateTime getCreatedOn() {
+        return createdOn;
+    }
+
+    public void setCreatedOn(DateTime createdOn) {
+        this.createdOn = createdOn;
+    }
+
+    public DateTime getLastUpdate() {
+        return lastUpdate;
+    }
+
+    public void setLastUpdate(DateTime lastUpdate) {
+        this.lastUpdate = lastUpdate;
+    }
 
     @Override
     public boolean equals(Object o) {
