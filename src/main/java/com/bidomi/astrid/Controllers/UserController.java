@@ -150,19 +150,20 @@ public class UserController {
     @PutMapping("/update_user")
     @ResponseBody
     public User updateUser(@RequestBody User user) {
-//        System.out.println("In /update_user");
+        System.out.println("In /update_user");
 //        String currentPrincipalName = SecurityContextHolder.getContext().getAuthentication().getName();
 //        System.out.println(currentPrincipalName);
-//        System.out.println("Incoming User : " + user);
+        System.out.println("Incoming User : " + user);
         try {
 //            System.out.println("CurrentPrincipalName: " + currentPrincipalName);
-            User u = userRepository.findByUsername(SecurityContextHolder.getContext().getAuthentication().getName()).get();
+            User u = userRepository.findByUsername(SecurityContextHolder.getContext()
+                    .getAuthentication().getName()).get();
             u.setLastVisit(DateTime.now());
             u.setName(user.getName());
             u.setPhoneNumber(user.getPhoneNumber());
             u.setLocation(user.getLocation());
-            System.out.println("In /update_user" + user.getLocation() + "\n"
-                    + u.getLocation());
+//            System.out.println("In /update_user" + user.getLocation() + "\n"
+//                    + u.getLocation());
             u = userRepository.save(u);
             return u;
         } catch (Exception ex) {
@@ -175,7 +176,7 @@ public class UserController {
     @ResponseBody
     public String changePassword(@RequestParam(value = "token") String token, @RequestParam(value = "login") String login,
                                  @RequestParam(value = "np") String newPassword) {
-        System.out.println("In /change_password");
+//        System.out.println("In /change_password");
         String decodedNewPassword = new String(Base64.getDecoder().decode(newPassword));
         try {
             User u = userRepository.findByUsername(login).get();
@@ -199,13 +200,13 @@ public class UserController {
     @DeleteMapping("/deleteUser")
     @ResponseBody
     public String deleteUser(@RequestParam(value = "id") Long id) {
-        System.out.println("In /delete_user");
+//        System.out.println("In /delete_user");
 //        String currentPrincipalName = SecurityContextHolder.getContext().getAuthentication().getName();
 //        System.out.println(currentPrincipalName);
         try {
             User u = userRepository.findById(id).get();
             String currentPrincipalName = SecurityContextHolder.getContext().getAuthentication().getName();
-            System.out.println("In /deleteUser" + id + "---" + " principal name " + currentPrincipalName + u.getUsername());
+//            System.out.println("In /deleteUser" + id + "---" + " principal name " + currentPrincipalName + u.getUsername());
             if (currentPrincipalName.equals(u.getUsername())) {
                 userRepository.delete(u);
                 return "true";

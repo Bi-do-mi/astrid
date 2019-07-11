@@ -22,7 +22,7 @@ public class ImageValue extends StdConverter<Collection<UnitImage>, Collection<U
             File f =  new File(""+unitsImagesPath+image.getFilename());
             String encodstring = encodeFileToBase64Binary(f);
             image.setValue(encodstring);
-            System.out.println(encodstring);
+//            System.out.println(encodstring);
         }
 
         return images;

@@ -109,7 +109,7 @@ public class UnitController {
     @GetMapping("/get_unit_types_list")
     public @ResponseBody
     ArrayList<JsonNode> getUnitTypesList() {
-        System.out.println(this.unitTypesRepository.findAll());
+//        System.out.println(this.unitTypesRepository.findAll());
         ArrayList<JsonNode> list = new ArrayList<JsonNode>();
         this.unitTypesRepository.findAll().forEach(ass -> {
             list.add(ass.getUnitType());

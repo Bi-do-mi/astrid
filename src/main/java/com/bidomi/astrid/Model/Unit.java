@@ -5,11 +5,11 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.vividsolutions.jts.geom.Geometry;
 import lombok.Data;
-import org.hibernate.annotations.DynamicInsert;
-import org.hibernate.annotations.DynamicUpdate;
+import org.hibernate.annotations.*;
 import org.joda.time.DateTime;
 
 import javax.persistence.*;
+import javax.persistence.Entity;
 import java.util.ArrayList;
 import java.util.Collection;
 
@@ -27,8 +27,6 @@ public class Unit {
     @JsonDeserialize(converter = UserIdToUser.class)
     private User ouner;
     @Column(nullable = false, length = 40)
-    private String assignment;
-    @Column(nullable = false, length = 40)
     private String type;
     @Column(nullable = false, length = 40)
     private String brand;
@@ -40,6 +38,7 @@ public class Unit {
     private boolean enabled;
     private boolean paid;
     private boolean testFor;
+
     @ElementCollection(fetch = FetchType.EAGER)
     @CollectionTable(name = "unit_images")
     @org.hibernate.annotations.CollectionId(
@@ -48,12 +47,25 @@ public class Unit {
             generator = "ID_GENERATOR")
     @JsonSerialize(converter = ImageValue.class)
     private Collection<UnitImage> images = new ArrayList<UnitImage>();
+
     @Column(name = "created_on", nullable = false, updatable = false,
             columnDefinition = "timestamp with time zone")
     private DateTime createdOn;
+
     @Column(name = "last_update", nullable = false, updatable = false,
             columnDefinition = "timestamp with time zone")
     private DateTime lastUpdate;
+
+    @Column(name = "paid_until", nullable = true, updatable = true,
+            columnDefinition = "timestamp with time zone")
+    private DateTime paidUntil;
+    @ElementCollection(fetch = FetchType.EAGER)
+    @CollectionTable(name = "unit_options")
+    @org.hibernate.annotations.CollectionId(
+            columns = @Column(name = "option_id"),
+            type = @org.hibernate.annotations.Type(type = "long"),
+            generator = "UNIT_OPTIONS_ID_GENERATOR")
+    private Collection<UnitOption> options;
 
     public Long getId() {
         return id;
@@ -69,14 +81,6 @@ public class Unit {
 
     public void setOuner(User ouner) {
         this.ouner = ouner;
-    }
-
-    public String getAssignment() {
-        return assignment;
-    }
-
-    public void setAssignment(String assignment) {
-        this.assignment = assignment;
     }
 
     public String getType() {
@@ -159,18 +163,33 @@ public class Unit {
         this.lastUpdate = lastUpdate;
     }
 
+    public DateTime getPaidUntil() {
+        return paidUntil;
+    }
+
+    public void setPaidUntil(DateTime paidUntil) {
+        this.paidUntil = paidUntil;
+    }
+
+    public Collection<UnitOption> getOptions() { return options; }
+
+    public void setOptions(Collection<UnitOption> options) { this.options = options; }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (!(o instanceof Unit )) return false;
+        if (!(o instanceof Unit)) return false;
         return id != null && id.equals(((Unit) o).getId());
     }
+
     @Override
     public int hashCode() {
         return 31;
     }
+
+    //    todo realize method
     @PreRemove
-    public void removeImages(){
+    public void removeImages() {
         System.out.println("removeImages() triggered!");
     }
 
@@ -179,7 +198,6 @@ public class Unit {
         return "\nUnit{" +
                 "\nid=" + id +
                 ", \nouner=" + ouner.getId() +
-                ", \nassignment='" + assignment + '\'' +
                 ", \ntype='" + type + '\'' +
                 ", \nbrand='" + brand + '\'' +
                 ", \nmodel='" + model + '\'' +
@@ -189,6 +207,7 @@ public class Unit {
                 ", \ntestFor=" + testFor +
                 ", \ncreatedOn=" + createdOn +
                 ", \nlastUpdate=" + lastUpdate +
+                ", \npaidUntil=" + paidUntil +
                 ", \nimages=" + images +
                 '}';
     }
