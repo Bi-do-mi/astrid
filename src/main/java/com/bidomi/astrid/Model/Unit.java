@@ -52,7 +52,7 @@ public class Unit {
             columnDefinition = "timestamp with time zone")
     private DateTime createdOn;
 
-    @Column(name = "last_update", nullable = false, updatable = false,
+    @Column(name = "last_update", nullable = false,
             columnDefinition = "timestamp with time zone")
     private DateTime lastUpdate;
 

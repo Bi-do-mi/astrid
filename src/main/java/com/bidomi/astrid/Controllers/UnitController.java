@@ -51,25 +51,8 @@ public class UnitController {
         if (!unit.getImages().isEmpty()) {
             try {
                 File dir = new File(unitsImagesPath);
-                if(!dir.exists()) dir.mkdir();
-                ArrayList<Unit> unitList = new ArrayList<>(user.getUnits());
-                Collections.sort(unitList, new Comparator<Unit>() {
-                    public int compare(Unit u1, Unit u2) {
-                        if (u1 == null || u2 == null || u1.getLastUpdate() == null
-                                || u2.getLastUpdate() == null) {
-                            return 0;
-                        }
-                        if (u1.getLastUpdate().isAfter(u2.getLastUpdate())) {
-                            return 1;
-                        }
-                        if (u1.getLastUpdate().equals(u2.getLastUpdate())) {
-                            return 0;
-                        } else {
-                            return -1;
-                        }
-                    }
-                });
-                Unit modifiedUnit = unitList.get(unitList.size() - 1);
+                if (!dir.exists()) dir.mkdir();
+                Unit modifiedUnit = sortUnits(user);
                 for (int p = 0; p < modifiedUnit.getImages().size(); p++) {
                     UnitImage incomingImage = new ArrayList<UnitImage>(
                             unit.getImages()).get(p);
@@ -91,6 +74,100 @@ public class UnitController {
             }
         }
         return user;
+    }
+
+    @PostMapping("/update_unit")
+    public @ResponseBody
+    User updateUnit(@RequestBody Unit unit) {
+//        System.out.println("updateUnit triggered!");
+        User user = this.userRepository.findById(unit.getOuner().getId()).get();
+        user.getUnits().forEach(u -> {
+            if (u.getId() == unit.getId()) {
+                u.setLastUpdate(DateTime.now());
+                u.setType(unit.getType());
+                u.setBrand(unit.getBrand());
+                u.setModel(unit.getModel());
+                u.setLocation(unit.getLocation());
+                u.setEnabled(unit.isEnabled());
+                u.setPaid(unit.isPaid());
+                u.setTestFor(unit.isTestFor());
+                u.setCreatedOn(unit.getCreatedOn());
+                u.setPaidUntil(unit.getPaidUntil());
+                u.setOptions(unit.getOptions());
+
+                ArrayList<UnitImage> newImagesList = new ArrayList<>(unit.getImages());
+                ArrayList<UnitImage> oldImagesList = new ArrayList<>(u.getImages());
+//                стираем удаленные фото из папки
+                if (oldImagesList.size() > 0) {
+                    oldImagesList.forEach(oldI -> {
+                        if (!newImagesList.contains(oldI)){
+                            File deleteFile = new File(unitsImagesPath + oldI.getFilename());
+                            deleteFile.delete();
+                        }
+                    });
+                }
+//                звписываем новые фото в папку
+                if (!newImagesList.isEmpty()) {
+                    newImagesList.forEach(newI -> {
+                       if (!oldImagesList.contains(newI)){
+                           try {
+                               newI.setFilename(DateTime.now().getMillis() + "_" + u.getId()
+                                       + "_" + newI.getFilename());
+                               BASE64Decoder decoder = new BASE64Decoder();
+                               ByteArrayInputStream bis = new ByteArrayInputStream(
+                                       (byte[]) decoder.decodeBuffer(newI.getValue()));
+                               BufferedImage image = ImageIO.read(bis);
+                               bis.close();
+                               File outputFile = new File(unitsImagesPath + newI.getFilename());
+                               ImageIO.write(image, "jpg", outputFile);
+                           } catch (IOException e) {
+                               e.printStackTrace();
+                           }
+                       }
+                    });
+                }
+                u.setImages(unit.getImages());
+            }
+        });
+        user.setLastVisit(DateTime.now());
+        user = userRepository.save(user);
+        return user;
+    }
+
+    private Unit sortUnits(User user) {
+        ArrayList<Unit> unitList = new ArrayList<>(user.getUnits());
+        Collections.sort(unitList, new Comparator<Unit>() {
+            public int compare(Unit u1, Unit u2) {
+                if (u1 == null || u2 == null || u1.getLastUpdate() == null
+                        || u2.getLastUpdate() == null) {
+                    return 0;
+                }
+                if (u1.getLastUpdate().isAfter(u2.getLastUpdate())) {
+                    return 1;
+                }
+                if (u1.getLastUpdate().equals(u2.getLastUpdate())) {
+                    return 0;
+                } else {
+                    return -1;
+                }
+            }
+        });
+        return unitList.get(unitList.size() - 1);
+    }
+
+    @PostMapping("/delete_unit")
+    public @ResponseBody
+    User deleteUnit(@RequestBody Unit unit) {
+        try {
+            User user = this.userRepository.findById(unit.getOuner().getId()).get();
+            user.getUnits().remove(unit);
+            user.setLastVisit(DateTime.now());
+            user = userRepository.save(user);
+            return user;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
     }
 
     @PreAuthorize("hasAnyRole('ADMIN')")

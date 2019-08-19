@@ -238,7 +238,7 @@ public class UserController {
     public @ResponseBody
     User getAll() {
 //        String currentPrincipalName = SecurityContextHolder.getContext().getAuthentication().getName();
-//        System.out.println("getAll()" + currentPrincipalName);
+        System.out.println("from getAll()");
         return this.userRepository.findAll().get(0);
 //        String str = "{\"type\":\"FeatureCollection\",\"features\":[{\"type\":\"Feature\",\"geometry\":{\"type\":\"Point\",\"coordinates\":[37.622504,55.753215]},\"properties\":{\"message\":\"value0\"}}]}";
 //        return str;
