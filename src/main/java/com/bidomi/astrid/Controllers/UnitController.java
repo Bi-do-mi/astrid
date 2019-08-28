@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.*;
 import sun.misc.BASE64Decoder;
 
 import javax.imageio.ImageIO;
+import javax.validation.constraints.NotNull;
 import java.awt.image.BufferedImage;
 import java.io.*;
 import java.util.*;
@@ -40,7 +41,7 @@ public class UnitController {
     @PostMapping("/create_unit")
     public @ResponseBody
     User createUnit(@RequestBody Unit unit) {
-//        System.out.println("sout unit: \n" + unit);
+//        System.out.println("/create_unit: \n" + unit);
         User user = this.userRepository.findById(unit.getOuner().getId()).get();
         unit.setCreatedOn(DateTime.now());
         unit.setLastUpdate(DateTime.now());
@@ -49,17 +50,34 @@ public class UnitController {
         user = userRepository.save(user);
 
         if (!unit.getImages().isEmpty()) {
-            try {
-                File dir = new File(unitsImagesPath);
-                if (!dir.exists()) dir.mkdir();
-                Unit modifiedUnit = sortUnits(user);
-                for (int p = 0; p < modifiedUnit.getImages().size(); p++) {
-                    UnitImage incomingImage = new ArrayList<UnitImage>(
-                            unit.getImages()).get(p);
-                    UnitImage i = new ArrayList<UnitImage>(
-                            modifiedUnit.getImages()).get(p);
-                    i.setFilename(DateTime.now().getMillis() + "_" + modifiedUnit.getId()
-                            + "_" + i.getFilename());
+            File dir = new File(unitsImagesPath);
+            if (!dir.exists()) dir.mkdir();
+            ArrayList<Unit> unitList = new ArrayList<>(user.getUnits());
+            Collections.sort(unitList, new Comparator<Unit>() {
+                public int compare(Unit u1, Unit u2) {
+                    if (u1 == null || u2 == null || u1.getLastUpdate() == null
+                            || u2.getLastUpdate() == null) {
+                        return 0;
+                    }
+                    if (u1.getLastUpdate().isAfter(u2.getLastUpdate())) {
+                        return 1;
+                    }
+                    if (u1.getLastUpdate().equals(u2.getLastUpdate())) {
+                        return 0;
+                    } else {
+                        return -1;
+                    }
+                }
+            });
+            Unit modifiedUnit = unitList.get(unitList.size() - 1);
+            for (int p = 0; p < modifiedUnit.getImages().size(); p++) {
+                UnitImage incomingImage = new ArrayList<UnitImage>(
+                        unit.getImages()).get(p);
+                UnitImage i = new ArrayList<UnitImage>(
+                        modifiedUnit.getImages()).get(p);
+                i.setFilename(DateTime.now().getMillis() + "_" + modifiedUnit.getId()
+                        + "_" + i.getFilename());
+                try {
                     BASE64Decoder decoder = new BASE64Decoder();
                     ByteArrayInputStream bis = new ByteArrayInputStream(
                             (byte[]) decoder.decodeBuffer(incomingImage.getValue()));
@@ -67,11 +85,12 @@ public class UnitController {
                     bis.close();
                     File outputFile = new File(unitsImagesPath + i.getFilename());
                     ImageIO.write(image, "jpg", outputFile);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                    modifiedUnit.getImages().remove(i);
                 }
-                user = userRepository.save(user);
-            } catch (Exception e) {
-                e.printStackTrace();
             }
+            user = userRepository.save(user);
         }
         return user;
     }
@@ -79,7 +98,7 @@ public class UnitController {
     @PostMapping("/update_unit")
     public @ResponseBody
     User updateUnit(@RequestBody Unit unit) {
-//        System.out.println("updateUnit triggered!");
+//        System.out.println("/update: \n" + unit);
         User user = this.userRepository.findById(unit.getOuner().getId()).get();
         user.getUnits().forEach(u -> {
             if (u.getId() == unit.getId()) {
@@ -95,12 +114,30 @@ public class UnitController {
                 u.setPaidUntil(unit.getPaidUntil());
                 u.setOptions(unit.getOptions());
 
-                ArrayList<UnitImage> newImagesList = new ArrayList<>(unit.getImages());
                 ArrayList<UnitImage> oldImagesList = new ArrayList<>(u.getImages());
+                if (unit.getImages().size() > 0) {
+                    unit.getImages().forEach(img -> {
+                        boolean containes = false;
+                        for (UnitImage old : oldImagesList) {
+                            System.out.println("old.getFilename()"+old.getFilename());
+                            System.out.println("img.getFilename()"+img.getFilename());
+                            if (old.getFilename().equals(img.getFilename())) {
+                                containes = true;
+                            }
+                            System.out.println("containes: " + containes);
+                        }
+                        if (!containes) {
+                            System.out.println("Triggered if (!oldImagesList.contains(img)) ");
+                            img.setFilename(DateTime.now().getMillis() + "_" + u.getId() +
+                                    "_" + img.getFilename());
+                        }
+                    });
+                }
+                ArrayList<UnitImage> newImagesList = new ArrayList<>(unit.getImages());
 //                стираем удаленные фото из папки
                 if (oldImagesList.size() > 0) {
                     oldImagesList.forEach(oldI -> {
-                        if (!newImagesList.contains(oldI)){
+                        if (!newImagesList.contains(oldI)) {
                             File deleteFile = new File(unitsImagesPath + oldI.getFilename());
                             deleteFile.delete();
                         }
@@ -109,21 +146,20 @@ public class UnitController {
 //                звписываем новые фото в папку
                 if (!newImagesList.isEmpty()) {
                     newImagesList.forEach(newI -> {
-                       if (!oldImagesList.contains(newI)){
-                           try {
-                               newI.setFilename(DateTime.now().getMillis() + "_" + u.getId()
-                                       + "_" + newI.getFilename());
-                               BASE64Decoder decoder = new BASE64Decoder();
-                               ByteArrayInputStream bis = new ByteArrayInputStream(
-                                       (byte[]) decoder.decodeBuffer(newI.getValue()));
-                               BufferedImage image = ImageIO.read(bis);
-                               bis.close();
-                               File outputFile = new File(unitsImagesPath + newI.getFilename());
-                               ImageIO.write(image, "jpg", outputFile);
-                           } catch (IOException e) {
-                               e.printStackTrace();
-                           }
-                       }
+                        if (!oldImagesList.contains(newI)) {
+                            try {
+                                BASE64Decoder decoder = new BASE64Decoder();
+                                ByteArrayInputStream bis = new ByteArrayInputStream(
+                                        (byte[]) decoder.decodeBuffer(newI.getValue()));
+                                BufferedImage image = ImageIO.read(bis);
+                                bis.close();
+                                File outputFile = new File(unitsImagesPath + newI.getFilename());
+                                ImageIO.write(image, "jpg", outputFile);
+                            } catch (IOException e) {
+                                e.printStackTrace();
+                                unit.getImages().remove(newI);
+                            }
+                        }
                     });
                 }
                 u.setImages(unit.getImages());
@@ -134,33 +170,21 @@ public class UnitController {
         return user;
     }
 
-    private Unit sortUnits(User user) {
-        ArrayList<Unit> unitList = new ArrayList<>(user.getUnits());
-        Collections.sort(unitList, new Comparator<Unit>() {
-            public int compare(Unit u1, Unit u2) {
-                if (u1 == null || u2 == null || u1.getLastUpdate() == null
-                        || u2.getLastUpdate() == null) {
-                    return 0;
-                }
-                if (u1.getLastUpdate().isAfter(u2.getLastUpdate())) {
-                    return 1;
-                }
-                if (u1.getLastUpdate().equals(u2.getLastUpdate())) {
-                    return 0;
-                } else {
-                    return -1;
-                }
-            }
-        });
-        return unitList.get(unitList.size() - 1);
-    }
-
     @PostMapping("/delete_unit")
     public @ResponseBody
     User deleteUnit(@RequestBody Unit unit) {
+//        System.out.println("/delete_unit: \n" + unit);
         try {
             User user = this.userRepository.findById(unit.getOuner().getId()).get();
             user.getUnits().remove(unit);
+            if (unit.getImages().size() > 0) {
+                unit.getImages().forEach(i -> {
+                    File deleteFile = new File(unitsImagesPath + i.getFilename());
+                    if (deleteFile.delete()) {
+                        System.out.println("Deleted: " + i.getFilename());
+                    }
+                });
+            }
             user.setLastVisit(DateTime.now());
             user = userRepository.save(user);
             return user;

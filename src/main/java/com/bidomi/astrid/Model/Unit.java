@@ -7,9 +7,11 @@ import com.vividsolutions.jts.geom.Geometry;
 import lombok.Data;
 import org.hibernate.annotations.*;
 import org.joda.time.DateTime;
+import org.springframework.beans.factory.annotation.Value;
 
 import javax.persistence.*;
 import javax.persistence.Entity;
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Collection;
 
@@ -18,6 +20,7 @@ import java.util.Collection;
 @DynamicInsert
 @DynamicUpdate
 public class Unit {
+
     @Id
     @GeneratedValue(generator = "UNIT_ID_GENERATOR")
     private Long id;
@@ -171,9 +174,13 @@ public class Unit {
         this.paidUntil = paidUntil;
     }
 
-    public Collection<UnitOption> getOptions() { return options; }
+    public Collection<UnitOption> getOptions() {
+        return options;
+    }
 
-    public void setOptions(Collection<UnitOption> options) { this.options = options; }
+    public void setOptions(Collection<UnitOption> options) {
+        this.options = options;
+    }
 
     @Override
     public boolean equals(Object o) {
@@ -187,11 +194,20 @@ public class Unit {
         return 31;
     }
 
-    //    todo realize method
-    @PreRemove
-    public void removeImages() {
-        System.out.println("removeImages() triggered!");
-    }
+//    @PreRemove
+//    public void removeImages() {
+//        System.out.println("removeImages: ");
+//        if (images.size() > 0) {
+//            System.out.println("if (images.size()>0)");
+//            images.forEach(i -> {
+//                System.out.println("i: " + unitsImagesPath + i.getFilename());
+//                File deleteFile = new File(unitsImagesPath + i.getFilename());
+//                if (deleteFile.delete()) {
+//                    System.out.println("Deleted: " + i.getFilename());
+//                }
+//            });
+//        }
+//    }
 
     @Override
     public String toString() {

@@ -18,13 +18,13 @@ public class ImageValue extends StdConverter<Collection<UnitImage>, Collection<U
     private String unitsImagesPath;
     @Override
     public Collection<UnitImage> convert(Collection<UnitImage> images) {
+//        System.out.println("ImageValue: " + images);
         for (UnitImage image: images){
             File f =  new File(""+unitsImagesPath+image.getFilename());
             String encodstring = encodeFileToBase64Binary(f);
             image.setValue(encodstring);
-//            System.out.println(encodstring);
+//            System.out.println("class ImageValue extends StdConverter" + encodstring);
         }
-
         return images;
     }
     private static String encodeFileToBase64Binary(File file){
@@ -34,6 +34,7 @@ public class ImageValue extends StdConverter<Collection<UnitImage>, Collection<U
             byte[] bytes = new byte[(int)file.length()];
             fileInputStreamReader.read(bytes);
             encodedfile = new String(Base64.encodeBase64(bytes), "UTF-8");
+            fileInputStreamReader.close();
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         } catch (IOException e) {
