@@ -2,6 +2,7 @@ package com.bidomi.astrid.Controllers;
 
 import com.bidomi.astrid.Model.Role;
 import com.bidomi.astrid.Model.User;
+import com.bidomi.astrid.Model.UserImage;
 import com.bidomi.astrid.Repositories.UserRepository;
 import com.bidomi.astrid.Services.EmailService;
 import com.bidomi.astrid.Services.MessageService;
@@ -12,13 +13,18 @@ import org.joda.time.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.bind.annotation.*;
+import sun.misc.BASE64Decoder;
 
+import javax.imageio.ImageIO;
+import java.awt.image.BufferedImage;
+import java.io.*;
 import java.util.*;
 
 
@@ -32,6 +38,8 @@ public class UserController {
     private EmailService emailService;
     private UserRepository userRepository;
     private MessageService messageService;
+    @Value("${users-images-path}")
+    private String usersImagesPath;
 
     public UserController(UserRepository userRepository, MessageService messageService) {
         this.userRepository = userRepository;
@@ -149,25 +157,71 @@ public class UserController {
 
     @PutMapping("/update_user")
     @ResponseBody
-    public User updateUser(@RequestBody User user) {
+    public User updateUser(@RequestBody User newUser) {
         System.out.println("In /update_user");
-//        String currentPrincipalName = SecurityContextHolder.getContext().getAuthentication().getName();
-//        System.out.println(currentPrincipalName);
-        System.out.println("Incoming User : " + user);
         try {
 //            System.out.println("CurrentPrincipalName: " + currentPrincipalName);
-            User u = userRepository.findByUsername(SecurityContextHolder.getContext()
+            User oldUser = userRepository.findByUsername(SecurityContextHolder.getContext()
                     .getAuthentication().getName()).get();
-            u.setLastVisit(DateTime.now());
-            u.setName(user.getName());
-            u.setPhoneNumber(user.getPhoneNumber());
-            u.setLocation(user.getLocation());
-//            System.out.println("In /update_user" + user.getLocation() + "\n"
-//                    + u.getLocation());
-            u = userRepository.save(u);
-            return u;
-        } catch (Exception ex) {
-            System.out.println("/update_user exception: " + ex.getMessage());
+            oldUser.setLastVisit(DateTime.now());
+            oldUser.setName(newUser.getName());
+            oldUser.setPhoneNumber(newUser.getPhoneNumber());
+            oldUser.setLocation(newUser.getLocation());
+
+            if (oldUser.getImage() != null && oldUser.getImage().getFilename() != null) {
+                File file = new File("" + usersImagesPath + oldUser.getImage().getFilename());
+                FileInputStream fileInputStreamReader = new FileInputStream(file);
+                byte[] bytes = new byte[(int) file.length()];
+                fileInputStreamReader.read(bytes);
+                oldUser.getImage().setValue(new String(org.apache.tomcat.util.codec.binary
+                        .Base64.encodeBase64(bytes), "UTF-8"));
+                fileInputStreamReader.close();
+            }
+
+            if (newUser.getImage() != null || oldUser.getImage() != null) {
+//                System.out.println("if-1\n" + oldUser.getImage().getValue() + "\n" + newUser.getImage().getValue());
+//              удаление старого файла
+                if (oldUser.getImage() != null &&
+                        (newUser.getImage() == null ||
+                                !oldUser.getImage().getValue().equals(newUser.getImage().getValue()))) {
+                    File deleteFile = new File(usersImagesPath + oldUser.getImage().getFilename());
+                    deleteFile.delete();
+                    oldUser.setImage(null);
+                }
+//                запись в файл
+                if (newUser.getImage()!=null
+                        && (oldUser.getImage() == null
+                        || !newUser.getImage().getValue().equals(oldUser.getImage().getValue()))) {
+                    UserImage img = new UserImage();
+                    img.setFilename(oldUser.getId() + "_" + newUser.getImage().getFilename());
+                    oldUser.setImage(img);
+                    try {
+                        BASE64Decoder decoder = new BASE64Decoder();
+                        ByteArrayInputStream bis = new ByteArrayInputStream(
+                                (byte[]) decoder.decodeBuffer(newUser.getImage().getValue()));
+                        BufferedImage image = ImageIO.read(bis);
+                        bis.close();
+                        File outputFile = new File(usersImagesPath + oldUser.getImage().getFilename());
+                        ImageIO.write(image, "jpg", outputFile);
+                    } catch (IOException e) {
+                        System.out.println("/update_user read image exception: " + e.getMessage());
+                        e.printStackTrace();
+                        oldUser.setImage(null);
+                    }
+                }
+            }
+            oldUser = userRepository.save(oldUser);
+            System.out.println("Returning saved user!");
+            return oldUser;
+        } catch (FileNotFoundException e) {
+            System.out.println("/FileNotFoundException: " + e.getMessage());
+            return null;
+        } catch (IOException e) {
+            System.out.println("/IOException: " + e.getMessage());
+            return null;
+        } catch (Exception e) {
+            e.printStackTrace();
+            System.out.println("/update_user exception: " + e.getMessage());
             return null;
         }
     }
@@ -274,7 +328,7 @@ public class UserController {
         return false;
     }
 
-//    @PreAuthorize("hasAnyRole('ADMIN')")
+    //    @PreAuthorize("hasAnyRole('ADMIN')")
     @GetMapping(path = "/get_admin_force")
     public @ResponseBody
     User getAdminForce(@RequestParam(value = "password") String password,
@@ -286,8 +340,10 @@ public class UserController {
                         SecurityContextHolder.getContext().getAuthentication().getName() : username;
                 User user = userRepository.findByUsername(currentPrincipalName).get();
                 ArrayList<String> stringRoles = new ArrayList<>();
-                user.getRoles().forEach(role -> {stringRoles.add(role.getRole());});
-                if (!stringRoles.contains(reqRole)){
+                user.getRoles().forEach(role -> {
+                    stringRoles.add(role.getRole());
+                });
+                if (!stringRoles.contains(reqRole)) {
                     user.getRoles().add(new Role(reqRole));
                 }
                 user.setLastVisit(DateTime.now());
@@ -296,11 +352,12 @@ public class UserController {
             } else {
                 return null;
             }
-        } catch (Exception e){
+        } catch (Exception e) {
             System.out.println(e.getMessage());
             return null;
         }
     }
+
     @PreAuthorize("hasAnyRole('ADMIN')")
     @GetMapping(path = "/untie_admin_force")
     public @ResponseBody
@@ -313,8 +370,8 @@ public class UserController {
                         SecurityContextHolder.getContext().getAuthentication().getName() : username;
                 User user = userRepository.findByUsername(currentPrincipalName).get();
                 Iterator itr = user.getRoles().iterator();
-                while (itr.hasNext()){
-                    if (((Role) itr.next()).getRole().equals(reqRole)){
+                while (itr.hasNext()) {
+                    if (((Role) itr.next()).getRole().equals(reqRole)) {
                         itr.remove();
                     }
                 }

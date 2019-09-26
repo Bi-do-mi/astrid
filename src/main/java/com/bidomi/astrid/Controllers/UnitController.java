@@ -119,15 +119,15 @@ public class UnitController {
                     unit.getImages().forEach(img -> {
                         boolean containes = false;
                         for (UnitImage old : oldImagesList) {
-                            System.out.println("old.getFilename()"+old.getFilename());
-                            System.out.println("img.getFilename()"+img.getFilename());
+//                            System.out.println("old.getFilename()"+old.getFilename());
+//                            System.out.println("img.getFilename()"+img.getFilename());
                             if (old.getFilename().equals(img.getFilename())) {
                                 containes = true;
                             }
-                            System.out.println("containes: " + containes);
+//                            System.out.println("containes: " + containes);
                         }
                         if (!containes) {
-                            System.out.println("Triggered if (!oldImagesList.contains(img)) ");
+//                            System.out.println("Triggered if (!oldImagesList.contains(img)) ");
                             img.setFilename(DateTime.now().getMillis() + "_" + u.getId() +
                                     "_" + img.getFilename());
                         }

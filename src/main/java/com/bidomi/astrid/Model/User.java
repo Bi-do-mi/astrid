@@ -2,6 +2,7 @@ package com.bidomi.astrid.Model;
 
 import com.bidomi.astrid.Converters.JsonPointToVivid;
 import com.bidomi.astrid.Converters.PasswordToNull;
+import com.bidomi.astrid.Converters.UserImageValue;
 import com.bidomi.astrid.Converters.VividPointToJson;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
@@ -71,8 +72,10 @@ public class User implements Serializable {
     @JsonDeserialize(converter = JsonPointToVivid.class)
     private Geometry location;
     @OneToMany(mappedBy = "ouner", cascade = CascadeType.ALL,
-    orphanRemoval = true)
+            orphanRemoval = true)
     private Collection<Unit> units = new ArrayList<Unit>();
+    @JsonSerialize(converter = UserImageValue.class)
+    private UserImage image = new UserImage();
 
     public User() {
     }
@@ -205,13 +208,22 @@ public class User implements Serializable {
 
     public Collection<Unit> getUnits() { return units; }
 
-    public void setUnits(Collection<Unit> units) { this.units = units; }
+    public UserImage getImage() { return image; }
 
-    public void addUnit(Unit u){
+    public void setImage(UserImage image) { this.image = image; }
+
+    public void setUnits(Collection<Unit> units) {
+        this.units = units;
+    }
+
+    public void addUnit(Unit u) {
         units.add(u);
         u.setOuner(this);
-    };
-    public void removeUnit(Unit u){
+    }
+
+    ;
+
+    public void removeUnit(Unit u) {
         units.remove(u);
         u.setOuner(null);
     }
@@ -233,7 +245,13 @@ public class User implements Serializable {
                 ", \nconfirmationToken='" + confirmationToken + '\'' +
                 ", \nphoneNumber='" + phoneNumber + '\'' +
                 ", \nlocation=" + location +
-                ", \nunits=" + units +
+                ", \nimage=" + image +
+                '}';
+    }
+
+    public String printUnits() {
+        return "Units: {" +
+                " \nunits=" + units +
                 '}';
     }
 }
