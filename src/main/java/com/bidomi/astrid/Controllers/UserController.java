@@ -40,6 +40,8 @@ public class UserController {
     private MessageService messageService;
     @Value("${users-images-path}")
     private String usersImagesPath;
+    @Value("${units-images-path}")
+    private String unitsImagesPath;
 
     public UserController(UserRepository userRepository, MessageService messageService) {
         this.userRepository = userRepository;
@@ -189,7 +191,7 @@ public class UserController {
                     oldUser.setImage(null);
                 }
 //                запись в файл
-                if (newUser.getImage()!=null
+                if (newUser.getImage() != null
                         && (oldUser.getImage() == null
                         || !newUser.getImage().getValue().equals(oldUser.getImage().getValue()))) {
                     UserImage img = new UserImage();
@@ -254,14 +256,25 @@ public class UserController {
     @DeleteMapping("/deleteUser")
     @ResponseBody
     public String deleteUser(@RequestParam(value = "id") Long id) {
-//        System.out.println("In /delete_user");
-//        String currentPrincipalName = SecurityContextHolder.getContext().getAuthentication().getName();
-//        System.out.println(currentPrincipalName);
         try {
             User u = userRepository.findById(id).get();
             String currentPrincipalName = SecurityContextHolder.getContext().getAuthentication().getName();
-//            System.out.println("In /deleteUser" + id + "---" + " principal name " + currentPrincipalName + u.getUsername());
             if (currentPrincipalName.equals(u.getUsername())) {
+                if (u.getUnits().size() > 0) {
+                    u.getUnits().forEach(unit -> {
+                        if (unit.getImages().size() > 0) {
+                            unit.getImages().forEach(i -> {
+                                File deleteFile = new File(unitsImagesPath
+                                        + i.getFilename());
+                                deleteFile.delete();
+                            });
+                        }
+                    });
+                }
+                if (u.getImage() != null) {
+                    File deleteFile = new File(usersImagesPath + u.getImage().getFilename());
+                    deleteFile.delete();
+                }
                 userRepository.delete(u);
                 return "true";
             }
