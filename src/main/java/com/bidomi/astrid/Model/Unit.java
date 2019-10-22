@@ -1,17 +1,16 @@
 package com.bidomi.astrid.Model;
 
+import com.bedatadriven.jackson.datatype.jts.serialization.GeometryDeserializer;
 import com.bidomi.astrid.Converters.*;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import com.vividsolutions.jts.geom.Geometry;
+import com.vividsolutions.jts.geom.Point;
 import lombok.Data;
-import org.hibernate.annotations.*;
+import org.hibernate.annotations.DynamicInsert;
+import org.hibernate.annotations.DynamicUpdate;
 import org.joda.time.DateTime;
-import org.springframework.beans.factory.annotation.Value;
 
 import javax.persistence.*;
-import javax.persistence.Entity;
-import java.io.File;
 import java.util.ArrayList;
 import java.util.Collection;
 
@@ -37,7 +36,7 @@ public class Unit {
     private String model;
     @JsonSerialize(converter = VividPointToJson.class)
     @JsonDeserialize(converter = JsonPointToVivid.class)
-    private Geometry location;
+    private Point location;
     private boolean enabled;
     private boolean paid;
     private boolean testFor;
@@ -110,11 +109,11 @@ public class Unit {
         this.model = model;
     }
 
-    public Geometry getLocation() {
+    public Point getLocation() {
         return location;
     }
 
-    public void setLocation(Geometry location) {
+    public void setLocation(Point location) {
         this.location = location;
     }
 

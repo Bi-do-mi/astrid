@@ -1,14 +1,13 @@
 package com.bidomi.astrid.Model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.vividsolutions.jts.geom.Geometry;
+import com.vividsolutions.jts.geom.Point;
 import org.joda.time.DateTime;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.Collection;
-import java.util.Set;
 import java.util.stream.Collectors;
 
 public class CustomUserDetails extends User implements UserDetails {
@@ -81,7 +80,7 @@ public class CustomUserDetails extends User implements UserDetails {
     public String getPhoneNumber() { return super.getPhoneNumber(); }
 
     @Override
-    public Geometry getLocation() {return super.getLocation();}
+    public Point getLocation() {return super.getLocation();}
 
 
 }

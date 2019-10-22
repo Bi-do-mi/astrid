@@ -1,24 +1,22 @@
 package com.bidomi.astrid.Model;
 
+import com.bedatadriven.jackson.datatype.jts.serialization.GeometryDeserializer;
+import com.bedatadriven.jackson.datatype.jts.serialization.GeometrySerializer;
 import com.bidomi.astrid.Converters.JsonPointToVivid;
 import com.bidomi.astrid.Converters.PasswordToNull;
 import com.bidomi.astrid.Converters.UserImageValue;
 import com.bidomi.astrid.Converters.VividPointToJson;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import com.vividsolutions.jts.geom.Geometry;
-import org.hibernate.annotations.*;
+import com.vividsolutions.jts.geom.Point;
+import org.hibernate.annotations.DynamicInsert;
+import org.hibernate.annotations.DynamicUpdate;
 import org.joda.time.DateTime;
 
 import javax.persistence.*;
-import javax.persistence.CascadeType;
-import javax.persistence.Entity;
-import javax.persistence.Table;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashSet;
-import java.util.Set;
 
 @Entity
 @Table(name = "users")
@@ -70,7 +68,7 @@ public class User implements Serializable {
     private String phoneNumber;
     @JsonSerialize(converter = VividPointToJson.class)
     @JsonDeserialize(converter = JsonPointToVivid.class)
-    private Geometry location;
+    private Point location;
     @OneToMany(mappedBy = "ouner", cascade = CascadeType.ALL,
             orphanRemoval = true)
     private Collection<Unit> units = new ArrayList<Unit>();
@@ -198,11 +196,11 @@ public class User implements Serializable {
         this.phoneNumber = phoneNumber;
     }
 
-    public Geometry getLocation() {
+    public Point getLocation() {
         return location;
     }
 
-    public void setLocation(Geometry location) {
+    public void setLocation(Point location) {
         this.location = location;
     }
 
