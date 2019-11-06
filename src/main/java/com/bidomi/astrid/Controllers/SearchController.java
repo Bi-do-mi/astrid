@@ -5,6 +5,7 @@ import com.bidomi.astrid.Model.User;
 import com.bidomi.astrid.Repositories.UserRepository;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.vividsolutions.jts.geom.MultiPolygon;
 import com.vividsolutions.jts.geom.Polygon;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -30,15 +31,25 @@ public class SearchController {
     }
 
     @PostMapping("/on_moveend")
-    public List<User> onMoveEnd(@RequestBody JsonNode polygon) {
-        if (polygon.get("geometry").get("type").asText().equals("Polygon")) {
+    public List<User> onMoveEnd(@RequestBody JsonNode mPolygon) {
+//        System.out.println("Polygon: \n" + mPolygon);
+        ObjectMapper mapper = new ObjectMapper();
+        mapper.registerModule(new JtsModule());
+
+        if (mPolygon.get("geometry").get("type").asText().equals("Polygon")) {
             try {
-                ObjectMapper mapper = new ObjectMapper();
-                mapper.registerModule(new JtsModule());
-                InputStream in = new ByteArrayInputStream(
-                        polygon.toString().getBytes(Charset.forName("UTF-8")));
-                Polygon polygon_ = mapper.readValue(polygon.get("geometry").toString(), Polygon.class);
+                Polygon polygon_ = mapper.readValue(mPolygon.get("geometry").toString(), Polygon.class);
                 return userRepository.getUsersWithinPolygon(polygon_);
+            } catch (IOException e) {
+                e.printStackTrace();
+                return null;
+            }
+        }
+        if (mPolygon.get("geometry").get("type").asText().equals("MultiPolygon")) {
+            try {
+                MultiPolygon multiPolygon = mapper.readValue(
+                        mPolygon.get("geometry").toString(), MultiPolygon.class);
+                return userRepository.getUsersWithinPolygon(multiPolygon);
             } catch (IOException e) {
                 e.printStackTrace();
                 return null;
