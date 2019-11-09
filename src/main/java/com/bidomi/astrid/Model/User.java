@@ -1,7 +1,5 @@
 package com.bidomi.astrid.Model;
 
-import com.bedatadriven.jackson.datatype.jts.serialization.GeometryDeserializer;
-import com.bedatadriven.jackson.datatype.jts.serialization.GeometrySerializer;
 import com.bidomi.astrid.Converters.JsonPointToVivid;
 import com.bidomi.astrid.Converters.PasswordToNull;
 import com.bidomi.astrid.Converters.UserImageValue;
@@ -9,6 +7,7 @@ import com.bidomi.astrid.Converters.VividPointToJson;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.vividsolutions.jts.geom.Point;
+import org.hibernate.annotations.Cascade;
 import org.hibernate.annotations.DynamicInsert;
 import org.hibernate.annotations.DynamicUpdate;
 import org.joda.time.DateTime;
@@ -25,7 +24,7 @@ import java.util.Collection;
 public class User implements Serializable {
 
     @Id
-    @GeneratedValue(generator = "ID_GENERATOR")
+    @GeneratedValue(generator = "USER_ID_GENERATOR")
 //    @Column(name = "user_id", columnDefinition = "BIGINT(20) UNSIGNED")
     @Column(name = "id")
     private Long id;
@@ -47,7 +46,7 @@ public class User implements Serializable {
     @org.hibernate.annotations.CollectionId(
             columns = @Column(name = "role_id"),
             type = @org.hibernate.annotations.Type(type = "long"),
-            generator = "ID_GENERATOR")
+            generator = "ROLE_ID_GENERATOR")
     private Collection<Role> roles = new ArrayList<Role>();
 
     @Column(length = 255, nullable = false)
@@ -69,7 +68,7 @@ public class User implements Serializable {
     @JsonSerialize(converter = VividPointToJson.class)
     @JsonDeserialize(converter = JsonPointToVivid.class)
     private Point location;
-    @OneToMany(mappedBy = "ouner", cascade = CascadeType.ALL,
+    @OneToMany(mappedBy = "ownerId", cascade = CascadeType.ALL,
             orphanRemoval = true)
     private Collection<Unit> units = new ArrayList<Unit>();
     @JsonSerialize(converter = UserImageValue.class)
@@ -216,14 +215,14 @@ public class User implements Serializable {
 
     public void addUnit(Unit u) {
         units.add(u);
-        u.setOuner(this);
+        u.setOwnerId(this);
     }
 
     ;
 
     public void removeUnit(Unit u) {
         units.remove(u);
-        u.setOuner(null);
+        u.setOwnerId(null);
     }
 
     @Override

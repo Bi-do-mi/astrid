@@ -35,22 +35,19 @@ public class SearchController {
 //        System.out.println("Polygon: \n" + mPolygon);
         ObjectMapper mapper = new ObjectMapper();
         mapper.registerModule(new JtsModule());
-
-        if (mPolygon.get("geometry").get("type").asText().equals("Polygon")) {
-            try {
-                Polygon polygon_ = mapper.readValue(mPolygon.get("geometry").toString(), Polygon.class);
-                return userRepository.getUsersWithinPolygon(polygon_);
-            } catch (IOException e) {
-                e.printStackTrace();
-                return null;
-            }
-        }
+        
         if (mPolygon.get("geometry").get("type").asText().equals("MultiPolygon")) {
+//            System.out.println("type=MultiPolygon\n" + mPolygon);
             try {
                 MultiPolygon multiPolygon = mapper.readValue(
                         mPolygon.get("geometry").toString(), MultiPolygon.class);
-                return userRepository.getUsersWithinPolygon(multiPolygon);
+             final List resp = new ArrayList();
+             resp.add(userRepository.getUsersWithinPolygon(multiPolygon));
+             resp.add(userRepository.getUnitsWithinPolygon(multiPolygon));
+             return resp;
             } catch (IOException e) {
+                System.out.println("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!\n"
+                        + e.getMessage());
                 e.printStackTrace();
                 return null;
             }

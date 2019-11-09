@@ -16,7 +16,6 @@ import org.springframework.web.bind.annotation.*;
 import sun.misc.BASE64Decoder;
 
 import javax.imageio.ImageIO;
-import javax.validation.constraints.NotNull;
 import java.awt.image.BufferedImage;
 import java.io.*;
 import java.util.*;
@@ -41,8 +40,7 @@ public class UnitController {
     @PostMapping("/create_unit")
     public @ResponseBody
     User createUnit(@RequestBody Unit unit) {
-//        System.out.println("/create_unit: \n" + unit);
-        User user = this.userRepository.findById(unit.getOuner().getId()).get();
+        User user = this.userRepository.findById(unit.getOwnerId().getId()).get();
         unit.setCreatedOn(DateTime.now());
         unit.setLastUpdate(DateTime.now());
         user.addUnit(unit);
@@ -99,7 +97,7 @@ public class UnitController {
     public @ResponseBody
     User updateUnit(@RequestBody Unit unit) {
 //        System.out.println("/update: \n" + unit);
-        User user = this.userRepository.findById(unit.getOuner().getId()).get();
+        User user = this.userRepository.findById(unit.getOwnerId().getId()).get();
         user.getUnits().forEach(u -> {
             if (u.getId() == unit.getId()) {
                 u.setLastUpdate(DateTime.now());
@@ -175,7 +173,7 @@ public class UnitController {
     User deleteUnit(@RequestBody Unit unit) {
 //        System.out.println("/delete_unit: \n" + unit);
         try {
-            User user = this.userRepository.findById(unit.getOuner().getId()).get();
+            User user = this.userRepository.findById(unit.getOwnerId().getId()).get();
             user.getUnits().remove(unit);
             if (unit.getImages().size() > 0) {
                 unit.getImages().forEach(i -> {

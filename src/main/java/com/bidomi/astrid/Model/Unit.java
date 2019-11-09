@@ -1,6 +1,5 @@
 package com.bidomi.astrid.Model;
 
-import com.bedatadriven.jackson.datatype.jts.serialization.GeometryDeserializer;
 import com.bidomi.astrid.Converters.*;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
@@ -27,7 +26,7 @@ public class Unit {
     @JoinColumn(name = "user_id", nullable = false)
     @JsonSerialize(converter = UserToUserId.class)
     @JsonDeserialize(converter = UserIdToUser.class)
-    private User ouner;
+    private User ownerId;
     @Column(nullable = false, length = 40)
     private String type;
     @Column(nullable = false, length = 40)
@@ -46,7 +45,7 @@ public class Unit {
     @org.hibernate.annotations.CollectionId(
             columns = @Column(name = "filename_id"),
             type = @org.hibernate.annotations.Type(type = "long"),
-            generator = "ID_GENERATOR")
+            generator = "UNIT_IMAGE_ID_GENERATOR")
     @JsonSerialize(converter = ImageValue.class)
     private Collection<UnitImage> images = new ArrayList<UnitImage>();
 
@@ -77,12 +76,12 @@ public class Unit {
         this.id = id;
     }
 
-    public User getOuner() {
-        return ouner;
+    public User getOwnerId() {
+        return ownerId;
     }
 
-    public void setOuner(User ouner) {
-        this.ouner = ouner;
+    public void setOwnerId(User ownerId) {
+        this.ownerId = ownerId;
     }
 
     public String getType() {
@@ -212,7 +211,7 @@ public class Unit {
     public String toString() {
         return "\nUnit{" +
                 "\nid=" + id +
-                ", \nouner=" + ouner.getId() +
+                ", \nownerId=" + ownerId.getId() +
                 ", \ntype='" + type + '\'' +
                 ", \nbrand='" + brand + '\'' +
                 ", \nmodel='" + model + '\'' +

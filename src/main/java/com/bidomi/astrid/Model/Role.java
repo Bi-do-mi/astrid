@@ -1,12 +1,8 @@
 package com.bidomi.astrid.Model;
 
-import lombok.AllArgsConstructor;
-import lombok.NoArgsConstructor;
-
-import javax.persistence.*;
+import javax.persistence.Embeddable;
 
 @Embeddable
-@Table(name = "roles")
 public class Role {
 //    @Id
 //    @GeneratedValue(generator = "ID_GENERATOR")
