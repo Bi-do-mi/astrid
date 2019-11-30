@@ -1,14 +1,11 @@
 package com.bidomi.astrid.Controllers;
 
-import com.bidomi.astrid.Model.Role;
-import com.bidomi.astrid.Model.User;
-import com.bidomi.astrid.Model.UserImage;
+import com.bidomi.astrid.Model.*;
 import com.bidomi.astrid.Repositories.UserRepository;
 import com.bidomi.astrid.Services.EmailService;
+import com.bidomi.astrid.Services.ImageService;
 import com.bidomi.astrid.Services.MessageService;
 import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.SerializationFeature;
 import org.joda.time.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -16,7 +13,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
-import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.bind.annotation.*;
@@ -36,6 +32,8 @@ public class UserController {
     private static final Logger log = LoggerFactory.getLogger(UserController.class);
     @Autowired
     private EmailService emailService;
+    @Autowired
+    private ImageService imageService;
     private UserRepository userRepository;
     private MessageService messageService;
     @Value("${users-images-path}")
@@ -149,6 +147,8 @@ public class UserController {
             u.setLastVisit(DateTime.now());
             u = userRepository.save(u);
 //            log.info(u.toString());
+            imageService.fillUsersUnitsImages(u);
+            imageService.fillUsersImage(u);
             return u;
         } catch (Exception ex) {
             System.out.println("/sign_in exception: " + ex.getMessage());
@@ -213,7 +213,9 @@ public class UserController {
                 }
             }
             oldUser = userRepository.save(oldUser);
-            System.out.println("Returning saved user!");
+//            System.out.println("Returning saved user!");
+            imageService.fillUsersUnitsImages(oldUser);
+            imageService.fillUsersImage(oldUser);
             return oldUser;
         } catch (FileNotFoundException e) {
             System.out.println("/FileNotFoundException: " + e.getMessage());
@@ -293,6 +295,8 @@ public class UserController {
             User u = userRepository.findByUsername(currentPrincipalName).get();
             u.setLastVisit(DateTime.now());
             u = userRepository.save(u);
+            imageService.fillUsersUnitsImages(u);
+            imageService.fillUsersImage(u);
             return u;
         } catch (Exception ex) {
             System.out.println("/check-auth exception: " + ex.getMessage());
@@ -301,15 +305,15 @@ public class UserController {
     }
 
     //    @PreAuthorize("hasAnyRole('USER')")
-    @GetMapping(path = "/all")
-    public @ResponseBody
-    User getAll() {
+//    @GetMapping(path = "/all")
+//    public @ResponseBody
+//    User getAll() {
 //        String currentPrincipalName = SecurityContextHolder.getContext().getAuthentication().getName();
-        System.out.println("from getAll()");
-        return this.userRepository.findAll().get(0);
+//        System.out.println("from getAll()");
+//        return this.userRepository.findAll().get(0);
 //        String str = "{\"type\":\"FeatureCollection\",\"features\":[{\"type\":\"Feature\",\"geometry\":{\"type\":\"Point\",\"coordinates\":[37.622504,55.753215]},\"properties\":{\"message\":\"value0\"}}]}";
 //        return str;
-    }
+//    }
 
     @PutMapping(path = "/save_location")
     public @ResponseBody
@@ -321,6 +325,7 @@ public class UserController {
             user.setLastVisit(DateTime.now());
             user.setLocation(usr.getLocation());
             user = userRepository.save(user);
+            imageService.fillUsersUnitsImages(user);
             return user;
         } catch (Exception e) {
             e.getMessage();
@@ -361,6 +366,8 @@ public class UserController {
                 }
                 user.setLastVisit(DateTime.now());
                 userRepository.save(user);
+                imageService.fillUsersUnitsImages(user);
+                imageService.fillUsersImage(user);
                 return user;
             } else {
                 return null;
@@ -390,6 +397,8 @@ public class UserController {
                 }
                 user.setLastVisit(DateTime.now());
                 userRepository.save(user);
+                imageService.fillUsersUnitsImages(user);
+                imageService.fillUsersImage(user);
                 return user;
             } else {
                 return null;
@@ -400,6 +409,20 @@ public class UserController {
         }
     }
 
+    @PutMapping("/get_users_image")
+    public @ResponseBody
+    User getUsersImage(@RequestBody User user) {
+//        System.out.println("\"/get_units_images\"");
+        try
+        {
+            Thread.sleep(2000);
+        }
+        catch(InterruptedException ex)
+        {
+            Thread.currentThread().interrupt();
+        }
+        return imageService.fillUsersImage(user);
+    }
 //    @PreAuthorize("hasAnyRole('USER')")
 //    @GetMapping(path = "/")
 //    public @ResponseBody

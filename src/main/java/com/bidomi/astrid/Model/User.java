@@ -71,7 +71,7 @@ public class User implements Serializable {
     @OneToMany(mappedBy = "ownerId", cascade = CascadeType.ALL,
             orphanRemoval = true)
     private Collection<Unit> units = new ArrayList<Unit>();
-    @JsonSerialize(converter = UserImageValue.class)
+//    @JsonSerialize(converter = UserImageValue.class)
     private UserImage image = new UserImage();
 
     public User() {

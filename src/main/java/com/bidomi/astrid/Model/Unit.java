@@ -46,7 +46,7 @@ public class Unit {
             columns = @Column(name = "filename_id"),
             type = @org.hibernate.annotations.Type(type = "long"),
             generator = "UNIT_IMAGE_ID_GENERATOR")
-    @JsonSerialize(converter = ImageValue.class)
+//    @JsonSerialize(converter = ImageValue.class)
     private Collection<UnitImage> images = new ArrayList<UnitImage>();
 
     @Column(name = "created_on", nullable = false, updatable = false,

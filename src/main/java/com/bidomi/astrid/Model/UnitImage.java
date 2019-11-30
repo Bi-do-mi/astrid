@@ -1,8 +1,5 @@
 package com.bidomi.astrid.Model;
 
-import com.bidomi.astrid.Converters.ImageValue;
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-
 import javax.persistence.Embeddable;
 import javax.persistence.Transient;
 

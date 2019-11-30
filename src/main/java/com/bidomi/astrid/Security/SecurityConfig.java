@@ -60,7 +60,9 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .and().authorizeRequests()
                 .antMatchers("/index.html", "/rest/users/sign_up", "/rest/users/all",
                         "/rest/users/name_check", "/home", "/rest/users/enable_user",
-                        "/rest/users/set_user_token", "/rest/users/change_password", "/rest/geo/create-markers"
+                        "/rest/users/set_user_token", "/rest/users/change_password",
+                        "/rest/search/on_moveend", "/rest/geo/create-markers",
+                        "/rest/units/get_units_images", "/rest/users/get_users_image"
                 )
                 .permitAll()
                 .anyRequest().authenticated()

@@ -6,17 +6,13 @@ import com.bidomi.astrid.Repositories.UserRepository;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.vividsolutions.jts.geom.MultiPolygon;
-import com.vividsolutions.jts.geom.Polygon;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.io.ByteArrayInputStream;
 import java.io.IOException;
-import java.io.InputStream;
-import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -30,6 +26,7 @@ public class SearchController {
         this.userRepository = userRepository;
     }
 
+//    @PreAuthorize("permitAll")
     @PostMapping("/on_moveend")
     public List<User> onMoveEnd(@RequestBody JsonNode mPolygon) {
 //        System.out.println("Polygon: \n" + mPolygon);

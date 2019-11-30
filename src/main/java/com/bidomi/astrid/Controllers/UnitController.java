@@ -6,6 +6,7 @@ import com.bidomi.astrid.Model.UnitImage;
 import com.bidomi.astrid.Model.User;
 import com.bidomi.astrid.Repositories.UnitTypesRepository;
 import com.bidomi.astrid.Repositories.UserRepository;
+import com.bidomi.astrid.Services.ImageService;
 import com.fasterxml.jackson.databind.JsonNode;
 import org.joda.time.DateTime;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,6 +30,8 @@ public class UnitController {
     private UnitTypesRepository unitTypesRepository;
     @Autowired
     private UserRepository userRepository;
+    @Autowired
+    private ImageService imageService;
 
     @Value("${units-images-path}")
     private String unitsImagesPath;
@@ -90,6 +93,7 @@ public class UnitController {
             }
             user = userRepository.save(user);
         }
+        imageService.fillUsersUnitsImages(user);
         return user;
     }
 
@@ -165,6 +169,7 @@ public class UnitController {
         });
         user.setLastVisit(DateTime.now());
         user = userRepository.save(user);
+        imageService.fillUsersUnitsImages(user);
         return user;
     }
 
@@ -185,6 +190,7 @@ public class UnitController {
             }
             user.setLastVisit(DateTime.now());
             user = userRepository.save(user);
+            imageService.fillUsersUnitsImages(user);
             return user;
         } catch (Exception e) {
             e.printStackTrace();
@@ -214,5 +220,20 @@ public class UnitController {
             list.add(ass.getUnitType());
         });
         return list;
+    }
+
+    @PutMapping("/get_units_images")
+    public @ResponseBody
+    Unit getUnitsImages(@RequestBody Unit unit) {
+//        System.out.println("\"/get_units_images\"");
+        try
+        {
+            Thread.sleep(2000);
+        }
+        catch(InterruptedException ex)
+        {
+            Thread.currentThread().interrupt();
+        }
+        return imageService.fillUnitsImages(unit);
     }
 }
