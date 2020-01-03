@@ -8,11 +8,13 @@ import com.bidomi.astrid.Repositories.UnitTypesRepository;
 import com.bidomi.astrid.Repositories.UserRepository;
 import com.bidomi.astrid.Services.ImageService;
 import com.fasterxml.jackson.databind.JsonNode;
+import com.vividsolutions.jts.geom.*;
 import org.joda.time.DateTime;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
+import org.springframework.util.SerializationUtils;
 import org.springframework.web.bind.annotation.*;
 import sun.misc.BASE64Decoder;
 
@@ -97,13 +99,50 @@ public class UnitController {
         return user;
     }
 
+//    @PostMapping("/create_unit")
+//    public @ResponseBody
+//    User createUnit(@RequestBody Unit unit) {
+//        User user = this.userRepository.findById(unit.getOwnerId().getId()).get();
+//        GeometryFactory gf = new GeometryFactory();
+//        Random random = new Random();
+//        double x = user.getLocation().getX();
+//        double xx = x+2;
+//        double y = unit.getLocation().getY();
+//        double yy = y+2;
+//        for (int i = 0; i < 500; i++) {
+//            Unit un = new Unit();
+//            un.setCreatedOn(DateTime.now());
+//            un.setLastUpdate(DateTime.now());
+//            un.setOptions(unit.getOptions());
+//            un.setPaidUntil(unit.getPaidUntil());
+//            un.setPaid(unit.isPaid());
+//            un.setTestFor(true);
+//            un.setEnabled(unit.isEnabled());
+//            un.setModel(unit.getModel());
+//            un.setBrand(unit.getBrand());
+//            un.setType(unit.getType());
+//            un.setOwnerId(unit.getOwnerId());
+//            un.setId(unit.getId());
+//            Point point = gf.createPoint(new Coordinate(
+//                    (x+random.nextDouble()*(xx-x)*(random.nextBoolean()?1:(-1))),
+//                    (y+random.nextDouble()*(yy-y)*(random.nextBoolean()?1:(-1)))));
+//            un.setLocation(point);
+//            user.addUnit(un);
+//            user.setLastVisit(DateTime.now());
+//            user = userRepository.save(user);
+//        }
+//        return user;
+//    }
+
     @PostMapping("/update_unit")
     public @ResponseBody
     User updateUnit(@RequestBody Unit unit) {
-//        System.out.println("/update: \n" + unit);
+
         User user = this.userRepository.findById(unit.getOwnerId().getId()).get();
         user.getUnits().forEach(u -> {
-            if (u.getId() == unit.getId()) {
+            if (u.getId().equals(unit.getId())) {
+//                System.out.println("/update: \n" + unit + "\nu.getId() = " + u.getId()
+//                        + "\nunit.getId() = " + unit.getId());
                 u.setLastUpdate(DateTime.now());
                 u.setType(unit.getType());
                 u.setBrand(unit.getBrand());
@@ -226,12 +265,9 @@ public class UnitController {
     public @ResponseBody
     Unit getUnitsImages(@RequestBody Unit unit) {
 //        System.out.println("\"/get_units_images\"");
-        try
-        {
+        try {
             Thread.sleep(2000);
-        }
-        catch(InterruptedException ex)
-        {
+        } catch (InterruptedException ex) {
             Thread.currentThread().interrupt();
         }
         return imageService.fillUnitsImages(unit);

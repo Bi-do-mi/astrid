@@ -1,12 +1,15 @@
 package com.bidomi.astrid.Controllers;
 
-import com.bidomi.astrid.Model.*;
+import com.bidomi.astrid.Model.Role;
+import com.bidomi.astrid.Model.Unit;
+import com.bidomi.astrid.Model.User;
+import com.bidomi.astrid.Model.UserImage;
 import com.bidomi.astrid.Repositories.UserRepository;
 import com.bidomi.astrid.Services.EmailService;
 import com.bidomi.astrid.Services.ImageService;
 import com.bidomi.astrid.Services.MessageService;
 import com.fasterxml.jackson.databind.JsonNode;
-import org.joda.time.*;
+import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -169,6 +172,10 @@ public class UserController {
             oldUser.setName(newUser.getName());
             oldUser.setPhoneNumber(newUser.getPhoneNumber());
             oldUser.setLocation(newUser.getLocation());
+            oldUser.getUnits().clear();
+            for (Iterator<Unit> i = newUser.getUnits().iterator(); i.hasNext();) {
+                oldUser.getUnits().add(i.next());
+            };
 
             if (oldUser.getImage() != null && oldUser.getImage().getFilename() != null) {
                 File file = new File("" + usersImagesPath + oldUser.getImage().getFilename());
@@ -413,12 +420,9 @@ public class UserController {
     public @ResponseBody
     User getUsersImage(@RequestBody User user) {
 //        System.out.println("\"/get_units_images\"");
-        try
-        {
+        try {
             Thread.sleep(2000);
-        }
-        catch(InterruptedException ex)
-        {
+        } catch (InterruptedException ex) {
             Thread.currentThread().interrupt();
         }
         return imageService.fillUsersImage(user);
