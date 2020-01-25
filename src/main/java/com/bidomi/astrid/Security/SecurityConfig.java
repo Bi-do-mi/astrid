@@ -3,6 +3,7 @@ package com.bidomi.astrid.Security;
 import com.bidomi.astrid.Repositories.UserRepository;
 import com.bidomi.astrid.Services.UserDetailsServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
@@ -12,17 +13,12 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.web.authentication.logout.LogoutSuccessHandler;
 import org.springframework.security.web.authentication.rememberme.JdbcTokenRepositoryImpl;
 import org.springframework.security.web.authentication.rememberme.PersistentTokenRepository;
 import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
-import org.springframework.web.cors.CorsConfiguration;
-import org.springframework.web.cors.CorsConfigurationSource;
-import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 import javax.sql.DataSource;
-import java.util.Arrays;
 
 @EnableWebSecurity
 @EnableJpaRepositories(basePackageClasses = UserRepository.class)
@@ -35,6 +31,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     private DataSource dataSource;
     @Autowired
     private AstridAuthenticationEntryPoint authenticationEntryPoint;
+    @Value("${serverLocDir}")
+    private String serverLocDir;
 
     @Override
     protected void configure(AuthenticationManagerBuilder auth) throws Exception {
@@ -49,7 +47,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         http
                 .cors()
                 .and()
-                .csrf().disable()
+//                .csrf().disable()
                 .csrf().csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
                 .and()
                 .httpBasic()
@@ -58,11 +56,20 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .and().logout().permitAll().deleteCookies("JSESSIONID")
                 .logoutRequestMatcher(new AntPathRequestMatcher("/logout"))
                 .and().authorizeRequests()
-                .antMatchers("/index.html", "/rest/users/sign_up", "/rest/users/all",
-                        "/rest/users/name_check", "/home", "/rest/users/enable_user",
-                        "/rest/users/set_user_token", "/rest/users/change_password",
-                        "/rest/search/on_moveend", "/rest/geo/create-markers",
-                        "/rest/units/get_units_images", "/rest/users/get_users_image"
+                .antMatchers(
+                        ("/index.html"),
+                        ("/rest/users/sign_up"),
+                        ("/rest/users/all"),
+                        ("/rest/users/name_check"),
+                        ("/home"),
+                        ("/rest/users/enable_user"),
+                        ("/rest/users/set_user_token"),
+                        ("/rest/users/change_password"),
+                        ("/rest/search/on_moveend"),
+                        ("/rest/geo/create-markers"),
+                        ("/rest/users/hello"),
+                        ("/rest/units/get_units_images"),
+                        ("/rest/users/get_users_image")
                 )
                 .permitAll()
                 .anyRequest().authenticated()

@@ -27,7 +27,7 @@ import java.io.*;
 import java.util.*;
 
 
-//@CrossOrigin(origins = "*", maxAge = 3600)
+@CrossOrigin(origins = "*", maxAge = 3600)
 @EnableGlobalMethodSecurity(prePostEnabled = true)
 @RestController
 @RequestMapping(path = "/rest/users")
@@ -43,6 +43,8 @@ public class UserController {
     private String usersImagesPath;
     @Value("${units-images-path}")
     private String unitsImagesPath;
+    @Value("${apiUrl}")
+    private String apiUrl;
 
     public UserController(UserRepository userRepository, MessageService messageService) {
         this.userRepository = userRepository;
@@ -71,8 +73,9 @@ public class UserController {
             String message = "<p>Вы зарегистрировались на сайте \"Астрид\".\n" +
                     "\n" +
                     "Для завершения регистрации, пожалуйста, подтвердите ваш электронный адрес:\n</p>" +
-                    "<a href='http://localhost:4200/preload/login?token=" + user.getConfirmationToken() + "&target=enable_user'>" +
-                    "http://localhost:4200/login\n</a>" +
+                    "<a href='" + apiUrl + "/preload/login?token=" + user.getConfirmationToken()
+                    + "&target=enable_user'>" + apiUrl +
+                    "/login\n</a>" +
                     "<p>Если вы не регистрировались на сайте \"Астрид\" — просто проигнорируйте это письмо.\n</p>";
 
             emailService.sendMail("noreplay", user.getUsername(), "Астрид. Регистрация.", message);
@@ -125,8 +128,9 @@ public class UserController {
                 String message = "<p>Вы или кто-то другой попытались сменить пароль на сайте \"Астрид\".\n" +
                         "\n" +
                         "Для смены пароля нажмите на ссылку ниже:\n</p>" +
-                        "<a href='http://localhost:4200/preload/login?token=" + u.getConfirmationToken() + "&target=new_password'>" +
-                        "http://localhost:4200/preload/login\n</a>" +
+                        "<a href='" + apiUrl + "/preload/login?token=" + u.getConfirmationToken()
+                        + "&target=new_password'>" + apiUrl +
+                        "/preload/login\n</a>" +
                         "<p>Если это были не Вы — просто проигнорируйте это письмо.\n</p>";
 
                 emailService.sendMail("noreplay", u.getUsername(), "Астрид. Смена пароля.", message);
@@ -173,9 +177,10 @@ public class UserController {
             oldUser.setPhoneNumber(newUser.getPhoneNumber());
             oldUser.setLocation(newUser.getLocation());
             oldUser.getUnits().clear();
-            for (Iterator<Unit> i = newUser.getUnits().iterator(); i.hasNext();) {
+            for (Iterator<Unit> i = newUser.getUnits().iterator(); i.hasNext(); ) {
                 oldUser.getUnits().add(i.next());
-            };
+            }
+            ;
 
             if (oldUser.getImage() != null && oldUser.getImage().getFilename() != null) {
                 File file = new File("" + usersImagesPath + oldUser.getImage().getFilename());
@@ -427,14 +432,15 @@ public class UserController {
         }
         return imageService.fillUsersImage(user);
     }
-//    @PreAuthorize("hasAnyRole('USER')")
-//    @GetMapping(path = "/")
-//    public @ResponseBody
-//    String getHello() {
-////        System.out.println(messageService.getMessage());
-////        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-////        String currentPrincipalName = authentication.getName();
-////        System.out.println("getAll()" + currentPrincipalName);
-//        return "Helloooo";
-//    }
+
+    //    @PreAuthorize("hasAnyRole('USER')")
+    @GetMapping(path = "/hello")
+    public @ResponseBody
+    String getHello() {
+//        System.out.println(messageService.getMessage());
+//        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+//        String currentPrincipalName = authentication.getName();
+//        System.out.println("getAll()" + currentPrincipalName);
+        return "Helloooo";
+    }
 }

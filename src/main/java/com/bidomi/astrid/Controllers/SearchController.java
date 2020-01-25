@@ -6,6 +6,7 @@ import com.bidomi.astrid.Repositories.UserRepository;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.vividsolutions.jts.geom.MultiPolygon;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -21,6 +22,8 @@ import java.util.List;
 @RequestMapping(path = "/rest/search")
 public class SearchController {
     private UserRepository userRepository;
+    @Value("${serverLocDir}")
+    private String serverLocDir;
 
     public SearchController(UserRepository userRepository) {
         this.userRepository = userRepository;
