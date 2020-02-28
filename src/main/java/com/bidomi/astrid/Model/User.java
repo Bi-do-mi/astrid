@@ -1,9 +1,6 @@
 package com.bidomi.astrid.Model;
 
-import com.bidomi.astrid.Converters.JsonPointToVivid;
-import com.bidomi.astrid.Converters.PasswordToNull;
-import com.bidomi.astrid.Converters.UserImageValue;
-import com.bidomi.astrid.Converters.VividPointToJson;
+import com.bidomi.astrid.Converters.*;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.vividsolutions.jts.geom.Point;
@@ -55,9 +52,11 @@ public class User implements Serializable {
     private boolean accountNonLocked = true;
     private boolean credentialsNonExpired = true;
     private boolean enabled = true;
+    @JsonSerialize(converter = SimplifyDate.class)
     @Column(name = "registration_date", nullable = false, updatable = false,
             columnDefinition = "timestamp with time zone")
     private DateTime registrationDate;
+    @JsonSerialize(converter = SimplifyDate.class)
     @Column(name = "last_visit", nullable = false,
             columnDefinition = "timestamp with time zone")
     private DateTime lastVisit;

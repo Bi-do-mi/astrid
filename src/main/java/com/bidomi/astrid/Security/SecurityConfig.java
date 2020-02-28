@@ -13,6 +13,7 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.web.authentication.logout.HttpStatusReturningLogoutSuccessHandler;
 import org.springframework.security.web.authentication.rememberme.JdbcTokenRepositoryImpl;
 import org.springframework.security.web.authentication.rememberme.PersistentTokenRepository;
 import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
@@ -49,19 +50,21 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .and()
 //                .csrf().disable()
                 .csrf().csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
-                .and()
-                .httpBasic()
+                .and().httpBasic()
 //               disable browser login prompt
                 .authenticationEntryPoint(authenticationEntryPoint)
-                .and().logout().permitAll().deleteCookies("JSESSIONID")
+                .and().logout().logoutSuccessHandler(new HttpStatusReturningLogoutSuccessHandler())
+                .permitAll().deleteCookies("JSESSIONID")
                 .logoutRequestMatcher(new AntPathRequestMatcher("/logout"))
                 .and().authorizeRequests()
                 .antMatchers(
                         ("/index.html"),
                         ("/rest/users/sign_up"),
+                        ("/rest/users/sign_in"),
                         ("/rest/users/all"),
                         ("/rest/users/name_check"),
                         ("/home"),
+                        ("/logout"),
                         ("/rest/users/enable_user"),
                         ("/rest/users/set_user_token"),
                         ("/rest/users/change_password"),

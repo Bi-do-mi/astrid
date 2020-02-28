@@ -24,7 +24,7 @@ public class ImageService {
 
     public User fillUsersImage(User user) {
         if (user.getImage() != null) {
-            System.out.println("fillUsersImage: \n" + user);
+//            System.out.println("fillUsersImage: \n" + user);
             File f = new File("" + usersImagesPath + user.getImage().getFilename());
             String encodstring = encodeFileToBase64Binary(f);
             user.getImage().setValue(encodstring);

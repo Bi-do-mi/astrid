@@ -153,7 +153,7 @@ public class UserController {
             User u = userRepository.findByUsername(currentPrincipalName).get();
             u.setLastVisit(DateTime.now());
             u = userRepository.save(u);
-//            log.info(u.toString());
+//            System.out.println(u.getRegistrationDate().getMillis());
             imageService.fillUsersUnitsImages(u);
             imageService.fillUsersImage(u);
             return u;

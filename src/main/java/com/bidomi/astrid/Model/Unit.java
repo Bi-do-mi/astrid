@@ -49,10 +49,12 @@ public class Unit {
 //    @JsonSerialize(converter = ImageValue.class)
     private Collection<UnitImage> images = new ArrayList<UnitImage>();
 
+    @JsonSerialize(converter = SimplifyDate.class)
     @Column(name = "created_on", nullable = false, updatable = false,
             columnDefinition = "timestamp with time zone")
     private DateTime createdOn;
 
+    @JsonSerialize(converter = SimplifyDate.class)
     @Column(name = "last_update", nullable = false,
             columnDefinition = "timestamp with time zone")
     private DateTime lastUpdate;
