@@ -72,7 +72,9 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                         ("/rest/geo/create-markers"),
                         ("/rest/users/hello"),
                         ("/rest/units/get_units_images"),
-                        ("/rest/users/get_users_image")
+                        ("/rest/users/get_users_image"),
+                        ("/rest/search/on_recheck_other_units"),
+                        ("/rest/search/on_recheck_oun_units")
                 )
                 .permitAll()
                 .anyRequest().authenticated()

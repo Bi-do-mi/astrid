@@ -167,7 +167,7 @@ public class UserController {
     @PutMapping("/update_user")
     @ResponseBody
     public User updateUser(@RequestBody User newUser) {
-        System.out.println("In /update_user");
+        System.out.println("In /update_user" + newUser.getLastVisit());
         try {
 //            System.out.println("CurrentPrincipalName: " + currentPrincipalName);
             User oldUser = userRepository.findByUsername(SecurityContextHolder.getContext()

@@ -59,6 +59,11 @@ public class Unit {
             columnDefinition = "timestamp with time zone")
     private DateTime lastUpdate;
 
+    @JsonSerialize(converter = SimplifyDate.class)
+    @Column(name = "work_end_date", nullable = true,
+            columnDefinition = "timestamp with time zone")
+    private DateTime workEnd;
+
     @Column(name = "paid_until", nullable = true, updatable = true,
             columnDefinition = "timestamp with time zone")
     private DateTime paidUntil;
@@ -174,6 +179,10 @@ public class Unit {
         this.paidUntil = paidUntil;
     }
 
+    public DateTime getWorkEnd() { return workEnd; }
+
+    public void setWorkEnd(DateTime workEnd) { this.workEnd = workEnd; }
+
     public Collection<UnitOption> getOptions() {
         return options;
     }
@@ -224,6 +233,7 @@ public class Unit {
                 ", \ncreatedOn=" + createdOn +
                 ", \nlastUpdate=" + lastUpdate +
                 ", \npaidUntil=" + paidUntil +
+                ", \nworkEnd=" + workEnd +
                 ", \nimages=" + images +
                 '}';
     }

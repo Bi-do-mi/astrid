@@ -8,13 +8,11 @@ import com.bidomi.astrid.Repositories.UnitTypesRepository;
 import com.bidomi.astrid.Repositories.UserRepository;
 import com.bidomi.astrid.Services.ImageService;
 import com.fasterxml.jackson.databind.JsonNode;
-import com.vividsolutions.jts.geom.*;
 import org.joda.time.DateTime;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
-import org.springframework.util.SerializationUtils;
 import org.springframework.web.bind.annotation.*;
 import sun.misc.BASE64Decoder;
 
@@ -141,8 +139,6 @@ public class UnitController {
         User user = this.userRepository.findById(unit.getOwnerId().getId()).get();
         user.getUnits().forEach(u -> {
             if (u.getId().equals(unit.getId())) {
-//                System.out.println("/update: \n" + unit + "\nu.getId() = " + u.getId()
-//                        + "\nunit.getId() = " + unit.getId());
                 u.setLastUpdate(DateTime.now());
                 u.setType(unit.getType());
                 u.setBrand(unit.getBrand());
@@ -153,6 +149,7 @@ public class UnitController {
                 u.setTestFor(unit.isTestFor());
                 u.setCreatedOn(unit.getCreatedOn());
                 u.setPaidUntil(unit.getPaidUntil());
+                u.setWorkEnd(unit.getWorkEnd());
                 u.setOptions(unit.getOptions());
 
                 ArrayList<UnitImage> oldImagesList = new ArrayList<>(u.getImages());
@@ -205,6 +202,11 @@ public class UnitController {
                 }
                 u.setImages(unit.getImages());
             }
+//            todo delete this
+//            if (!u.getId().equals(unit.getId())) {
+//                u.setLastUpdate(DateTime.now());
+//                u.setWorkEnd(unit.getWorkEnd());
+//            }
         });
         user.setLastVisit(DateTime.now());
         user = userRepository.save(user);
