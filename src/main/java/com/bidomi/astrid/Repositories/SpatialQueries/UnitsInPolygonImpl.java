@@ -1,5 +1,6 @@
 package com.bidomi.astrid.Repositories.SpatialQueries;
 
+import com.bidomi.astrid.Model.Unit;
 import com.bidomi.astrid.Model.User;
 import com.google.common.base.Predicate;
 import com.google.common.collect.Collections2;
@@ -11,21 +12,21 @@ import javax.persistence.Query;
 import java.util.ArrayList;
 import java.util.List;
 
-public class UsersInPolygonImpl implements UsersInPolygon {
+public class UnitsInPolygonImpl implements UnitsInPolygon {
 
     @PersistenceContext
     private EntityManager em;
 
     @Override
-    public List getUsersWithinPolygon(Geometry polygon) {
-        Query query = em.createQuery("select u from User u" +
-                " where within(u.location, :filter) = true", User.class);
+    public List getUnitsWithinPolygon(Geometry polygon) {
+        Query query = em.createQuery("select u from Unit u" +
+                " where within(u.location, :filter) = true", Unit.class);
         query.setParameter("filter", polygon);
-        return new ArrayList(Collections2.filter(((List<User>)query.getResultList()),
-                new Predicate<User>() {
+        return new ArrayList(Collections2.filter(((List<Unit>)query.getResultList()),
+                new Predicate<Unit>() {
                     @Override
-                    public boolean apply(User user) {
-                        return user.isEnabled();
+                    public boolean apply(Unit unit) {
+                        return unit.getOwnerId().isEnabled();
                     }
                 }));
     }

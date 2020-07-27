@@ -4,6 +4,6 @@ import com.vividsolutions.jts.geom.Geometry;
 
 import java.util.List;
 
-public interface UsersInPolygon<T> {
-    List<T> getUsersWithinPolygon(Geometry polygon);
+public interface UnitsInPolygon<T> {
+    List<T> getUnitsWithinPolygon(Geometry polygon);
 }

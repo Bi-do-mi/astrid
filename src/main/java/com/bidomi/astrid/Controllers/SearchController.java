@@ -45,9 +45,9 @@ public class SearchController {
             try {
                 MultiPolygon multiPolygon = mapper.readValue(
                         mPolygon.get("geometry").toString(), MultiPolygon.class);
-                final List resp = new ArrayList();
+                final List resp = new ArrayList<ArrayList>();
                 resp.add(userRepository.getUsersWithinPolygon(multiPolygon));
-                resp.add(userRepository.getUnitsWithinPolygon(multiPolygon));
+                resp.add(unitRepository.getUnitsWithinPolygon(multiPolygon));
                 return resp;
             } catch (IOException e) {
                 System.out.println("!!!\n"
@@ -88,5 +88,12 @@ public class SearchController {
             }
         });
         return user;
+    }
+
+    @PutMapping("get_owner")
+    @ResponseBody
+    public User getOner(@RequestBody Long ownerId) {
+        User u = userRepository.findById(ownerId).get();
+        return u.isEnabled() ? u : null;
     }
 }

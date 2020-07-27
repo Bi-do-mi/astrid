@@ -71,6 +71,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                         ("/rest/search/on_moveend"),
                         ("/rest/geo/create-markers"),
                         ("/rest/users/hello"),
+                        ("/rest/search/get_owner"),
                         ("/rest/units/get_units_images"),
                         ("/rest/users/get_users_image"),
                         ("/rest/search/on_recheck_other_units"),
