@@ -25,6 +25,10 @@ import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.*;
 import java.util.*;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 
 
 @CrossOrigin(origins = "*", maxAge = 3600)
@@ -45,6 +49,8 @@ public class UserController {
     private String unitsImagesPath;
     @Value("${apiUrl}")
     private String apiUrl;
+    @Value("${spring.mail.username}")
+    private String senderName;
 
     public UserController(UserRepository userRepository, MessageService messageService) {
         this.userRepository = userRepository;
@@ -68,19 +74,91 @@ public class UserController {
         user.setLastVisit(DateTime.now());
         user.setEnabled(false);
         user.setConfirmationToken(UUID.randomUUID().toString());
+        long savedUserId = userRepository.save(user).getId();
         try {
-            userRepository.save(user);
-            String message = "<p>Вы зарегистрировались на сайте \"Астрид\".\n" +
+            String message = "<table style=\"width: 538px;background-color: #212121;\" align=\"center\" cellspacing=\"0\" cellpadding=\"0\">\n" +
+                    "  <tbody>\n" +
+                    "    <tr>\n" +
+                    "      <td style=\"display: flex; flex-direction: row; padding: 3px;\n" +
+                    "  justify-content: flex-start;height: 65px;background-color: #212121;border-bottom: 2px solid #fbc02d;\">\n" +
+                    "        <img src=\"https://technokarta.ru/assets/icons/logo.png\" height=\"60\" alt=\"Technokarta\">\n" +
+                    "        <p style=\"vertical-align: middle; padding-left: 8px;font-size: 24px;color: white;font-family: Arial, Helvetica, sans-serif;\">Технокарта</p>\n" +
+                    "      </td>\n" +
+                    "    </tr>\n" +
+                    "    <tr>\n" +
+                    "      <td bgcolor=\"#212121\">\n" +
+                    "        <table width=\"470\" border=\"0\" align=\"center\" cellpadding=\"0\" cellspacing=\"0\" style=\"padding-left: 5px;padding-right: 5px;padding-bottom: 10px;\">\n" +
                     "\n" +
-                    "Для завершения регистрации, пожалуйста, подтвердите ваш электронный адрес:\n</p>" +
-                    "<a href='" + apiUrl + "/preload/login?token=" + user.getConfirmationToken()
-                    + "&target=enable_user'>" + apiUrl +
-                    "/login\n</a>" +
-                    "<p>Если вы не регистрировались на сайте \"Астрид\" — просто проигнорируйте это письмо.\n</p>";
+                    "          <tbody>\n" +
+                    "            <tr bgcolor=\"#212121\">\n" +
+                    "              <td style=\"padding-top: 32px;\">\n" +
+                    "                <span style=\"padding-top: 16px;padding-bottom: 16px;font-size: 24px;color: #c6d4df;font-family: Arial, Helvetica, sans-serif;font-weight: bold;\">\n" +
+                    "                  Здравствуйте, " + user.getName() + ".\n" +
+                    "                </span><br>\n" +
+                    "              </td>\n" +
+                    "            </tr>\n" +
+                    "\n" +
+                    "            <tr>\n" +
+                    "              <td style=\"padding-top: 12px;\">\n" +
+                    "                <span style=\"font-size: 17px;color: #c6d4df;font-family: Arial, Helvetica, sans-serif;font-weight: bold;\">\n" +
+                    "                  <p style=\"color: #c6d4df;\">Нажмите на кнопку ниже для активации аккаунта в сервисе \"Технокарта\":</p>\n" +
+                    "                </span>\n" +
+                    "              </td>\n" +
+                    "            </tr>\n" +
+                    "\n" +
+                    "\n" +
+                    "            <tr style=\"border-collapse:collapse\">\n" +
+                    "              <td align=\"center\" style=\"margin:0;padding-left:10px;padding-right:10px;padding-top:40px;padding-bottom:40px\">\n" +
+                    "                <span style=\"border-style:solid;border-color:#2CB543;background:#F38181;border-width:0px;display:inline-block;border-radius:5px;width:auto\">\n" +
+                    "                  <a href=\"" + apiUrl + "/preload/login?token=" + user.getConfirmationToken() + "&target=enable_user\";target=\"_blank\" " +
+                    "                   style=\"mso-style-priority:100 !important;text-decoration:none !important;-webkit-text-size-adjust:none;" +
+                    "                   -ms-text-size-adjust:none;font-family:arial, 'helvetica neue', helvetica, sans-serif;font-size:20px;color:black;border-style:solid;border-color:#fbc02d;" +
+                    "                   border-width:20px 80px;display:inline-block;background:#fbc02d;border-radius:5px;font-weight:normal;font-style:normal;line-height:24px;width:auto;" +
+                    "                   text-align:center\" rel=\" noopener noreferrer\">АКТИВИРОВАТЬ</a>\n" +
+                    "                </span>\n" +
+                    "              </td>\n" +
+                    "            </tr>\n" +
+                    "\n" +
+                    "\n" +
+                    "            <tr bgcolor=\"#212121\">\n" +
+                    "              <td style=\"padding: 20px;font-size: 12px;line-height: 17px;color: #c6d4df;font-family: Arial, Helvetica, sans-serif;\">\n" +
+                    "                <p style=\"padding-bottom: 10px;color: #c6d4df;\">Если вы не регистрировались на сайте <a style=\"color: #c6d4df;\" href=\"https://technokarta.ru\" target=\"_blank\" rel=\" noopener noreferrer\">technokarta.ru</a> — просто проигнорируйте это письмо.</p>\n" +
+                    "                <p style=\"padding-bottom: 10px;color: #c6d4df;\">Неподтвержденный аккаунт будет удален через 15 минут.</p>\n" +
+                    "             \n" +
+                    "              </td>\n" +
+                    "\n" +
+                    "            </tr>\n" +
+                    "\n" +
+                    "          </tbody>\n" +
+                    "        </table>\n" +
+                    "      </td>\n" +
+                    "    </tr>\n" +
+                    "\n" +
+                    "\n" +
+                    "  </tbody>\n" +
+                    "</table>\n";
 
-            emailService.sendMail("noreplay", user.getUsername(), "Астрид. Регистрация.", message);
+            emailService.sendMail(senderName, user.getUsername(), "Технокарта. Регистрация.", message);
+            emailService.sendMail(senderName, senderName, "Технокарта. Регистрация.", message);
+            ScheduledExecutorService executorService = Executors.newSingleThreadScheduledExecutor();
+            TimerTask deleteUser = new TimerTask() {
+                @Override
+                public void run() {
+                    User userFromRepo = userRepository.findById(savedUserId).get();
+                    if (userFromRepo.getConfirmationToken() != null) {
+                        userRepository.delete(userFromRepo);
+                    }
+                }
+            };
+            executorService.schedule(deleteUser, 15, TimeUnit.MINUTES);
+            executorService.shutdown();
         } catch (Exception e) {
-            log.error(e.getMessage());
+            User userFromRepo = userRepository.findById(savedUserId).get();
+            if (userFromRepo.getConfirmationToken() != null) {
+                userRepository.delete(userFromRepo);
+            }
+            emailService.sendMail(senderName, senderName, "Ошибка при регистрации.", e.getMessage());
+            System.out.println("Ошибка при регистрации: " + e.getMessage());
             throw (e);
         }
     }
@@ -89,11 +167,6 @@ public class UserController {
     @ResponseBody
     public String nameCheck(@RequestParam(value = "name") String name) {
         try {
-            try {
-                Thread.sleep(1000);
-            } catch (InterruptedException ex) {
-                Thread.currentThread().interrupt();
-            }
             return userRepository.findByUsername(name).get().getUsername();
         } catch (NoSuchElementException e) {
             return "not found";
@@ -120,25 +193,106 @@ public class UserController {
     @GetMapping("/set_user_token")
     @ResponseBody
     public String setUserToken(@RequestParam(value = "login") String login) {
+        User u = null;
         try {
-            User u = userRepository.findByUsername(login).get();
+            u = userRepository.findByUsername(login).get();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        long savedUserId = u.getId();
+        String confirmationToken = UUID.randomUUID().toString();
+        try {
             if (u.getUsername().equals(login)) {
-                u.setConfirmationToken(UUID.randomUUID().toString());
-                userRepository.save(u);
-                String message = "<p>Вы или кто-то другой попытались сменить пароль на сайте \"Астрид\".\n" +
+                u.setConfirmationToken(confirmationToken);
+                userRepository.save(u).getId();
+                String message = "<table style=\"width: 538px;background-color: #212121;\" align=\"center\" cellspacing=\"0\" cellpadding=\"0\">\n" +
+                        "  <tbody>\n" +
+                        "    <tr>\n" +
+                        "      <td style=\"display: flex; flex-direction: row; padding: 3px;\n" +
+                        "  justify-content: flex-start;height: 65px;background-color: #212121;border-bottom: 2px solid #fbc02d;\">\n" +
+                        "        <img src=\"https://technokarta.ru/assets/icons/logo.png\" height=\"60\" alt=\"Technokarta\">\n" +
+                        "        <p style=\"vertical-align: middle; padding-left: 8px;font-size: 24px;color: white;font-family: Arial, Helvetica, sans-serif;\">Технокарта</p>\n" +
+                        "      </td>\n" +
+                        "    </tr>\n" +
+                        "    <tr>\n" +
+                        "      <td bgcolor=\"#212121\">\n" +
+                        "        <table width=\"470\" border=\"0\" align=\"center\" cellpadding=\"0\" cellspacing=\"0\" style=\"padding-left: 5px;padding-right: 5px;padding-bottom: 10px;\">\n" +
                         "\n" +
-                        "Для смены пароля нажмите на ссылку ниже:\n</p>" +
-                        "<a href='" + apiUrl + "/preload/login?token=" + u.getConfirmationToken()
-                        + "&target=new_password'>" + apiUrl +
-                        "/preload/login\n</a>" +
-                        "<p>Если это были не Вы — просто проигнорируйте это письмо.\n</p>";
+                        "          <tbody>\n" +
+                        "            <tr bgcolor=\"#212121\">\n" +
+                        "              <td style=\"padding-top: 32px;\">\n" +
+                        "                <span style=\"padding-top: 16px;padding-bottom: 16px;font-size: 24px;color: #c6d4df;font-family: Arial, Helvetica, sans-serif;font-weight: bold;\">\n" +
+                        "                  Здравствуйте, " + u.getName() + ".\n" +
+                        "                </span><br>\n" +
+                        "              </td>\n" +
+                        "            </tr>\n" +
+                        "\n" +
+                        "            <tr>\n" +
+                        "              <td style=\"padding-top: 12px;\">\n" +
+                        "                <span style=\"font-size: 17px;color: #c6d4df;font-family: Arial, Helvetica, sans-serif;font-weight: bold;\">\n" +
+                        "                  <p>Вы или кто-то другой попытались сменить пароль на сервисе \"Технокарта\". Для смены пароля нажмите на кнопку ниже:</p>\n" +
+                        "                </span>\n" +
+                        "              </td>\n" +
+                        "            </tr>\n" +
+                        "\n" +
+                        "\n" +
+                        "            <tr style=\"border-collapse:collapse\">\n" +
+                        "              <td align=\"center\" style=\"margin:0;padding-left:10px;padding-right:10px;padding-top:40px;padding-bottom:40px\">\n" +
+                        "                <span style=\"border-style:solid;border-color:#2CB543;background:#F38181;border-width:0px;display:inline-block;border-radius:5px;width:auto\">\n" +
+                        "                  <a href=\"" + apiUrl + "/preload/login?token=" + u.getConfirmationToken() + "&target=new_password\" target=\"_blank\" " +
+                        "                   style=\"mso-style-priority:100 !important;text-decoration:none !important;-webkit-text-size-adjust:none;-ms-text-size-adjust:none;font-family:arial," +
+                        "                   'helvetica neue', helvetica, sans-serif;font-size:20px;color:black;border-style:solid;border-color:#fbc02d;border-width:20px 80px;display:inline-block;" +
+                        "                   background:#fbc02d;border-radius:5px;font-weight:normal;font-style:normal;line-height:24px;width:auto;text-align:center\" rel=\" noopener noreferrer\">СМЕНИТЬ ПАРОЛЬ</a>\n" +
+                        "                </span>\n" +
+                        "              </td>\n" +
+                        "            </tr>\n" +
+                        "\n" +
+                        "\n" +
+                        "            <tr bgcolor=\"#212121\">\n" +
+                        "              <td style=\"padding: 20px;font-size: 12px;line-height: 17px;color: #c6d4df;font-family: Arial, Helvetica, sans-serif;\">\n" +
+                        "                <p style=\"padding-bottom: 10px;color: #c6d4df;\">Если это были не вы — просто проигнорируйте это письмо.</p>\n" +
+                        "             \n" +
+                        "              </td>\n" +
+                        "\n" +
+                        "            </tr>\n" +
+                        "\n" +
+                        "          </tbody>\n" +
+                        "        </table>\n" +
+                        "      </td>\n" +
+                        "    </tr>\n" +
+                        "\n" +
+                        "\n" +
+                        "  </tbody>\n" +
+                        "</table>\n";
 
-                emailService.sendMail("noreplay", u.getUsername(), "Астрид. Смена пароля.", message);
+                emailService.sendMail(senderName, u.getUsername(), "Технокарта. Смена пароля.", message);
+                emailService.sendMail(senderName, senderName, "Технокарта. Смена пароля.", message);
+                ScheduledExecutorService executorService = Executors.newSingleThreadScheduledExecutor();
+                TimerTask deleteUser = new TimerTask() {
+                    @Override
+                    public void run() {
+                        User userFromRepo = userRepository.findById(savedUserId).get();
+                        if ((userFromRepo.getConfirmationToken() != null) &&
+                        userFromRepo.getConfirmationToken().equals(confirmationToken)) {
+                            userFromRepo.setConfirmationToken(null);
+                            userRepository.save(userFromRepo);
+                        }
+                    }
+                };
+                executorService.schedule(deleteUser, 35, TimeUnit.SECONDS);
+                executorService.shutdown();
                 return "set_user_token true";
             }
             return "set_user_token false";
         } catch (NoSuchElementException e) {
-//            System.out.println("NoSuchElementException "+e.getMessage());
+            System.out.println("Ошибка при смене пароля! " + e.getMessage());
+            User userFromRepo = userRepository.findById(savedUserId).get();
+            if ((userFromRepo.getConfirmationToken() != null) &&
+                    userFromRepo.getConfirmationToken().equals(confirmationToken)) {
+                userFromRepo.setConfirmationToken(null);
+                userRepository.save(userFromRepo);
+            }
+            emailService.sendMail(senderName, senderName, "Ошибка при смене пароля.", e.getMessage());
             return e.getMessage();
         }
     }
@@ -254,8 +408,34 @@ public class UserController {
             if (!decodedNewPassword.equals("") && u.getConfirmationToken().equals(token)) {
                 u.setPassword(new BCryptPasswordEncoder().encode(decodedNewPassword));
                 u.setConfirmationToken(null);
-                emailService.sendMail("noreplay", u.getUsername(), "Астрид. Смена пароля.",
-                        "Пароль был изменен.");
+                String message = "<table style=\"width: 538px;background-color: #212121;\" align=\"center\" cellspacing=\"0\" cellpadding=\"0\">\n" +
+                        "  <tbody>\n" +
+                        "    <tr>\n" +
+                        "      <td style=\"display: flex; flex-direction: row; padding: 3px;\n" +
+                        "  justify-content: flex-start;height: 65px;background-color: #212121;border-bottom: 2px solid #fbc02d;\">\n" +
+                        "        <img src=\"https://technokarta.ru/assets/icons/logo.png\" height=\"60\" alt=\"Technokarta\">\n" +
+                        "        <p style=\"vertical-align: middle; padding-left: 8px;font-size: 24px;color: white;font-family: Arial, Helvetica, sans-serif;\">Технокарта</p>\n" +
+                        "      </td>\n" +
+                        "    </tr>\n" +
+                        "    <tr>\n" +
+                        "      <td bgcolor=\"#212121\">\n" +
+                        "        <table width=\"470\" border=\"0\" align=\"center\" cellpadding=\"0\" cellspacing=\"0\" style=\"padding-left: 5px;padding-right: 5px;padding-bottom: 10px;\">\n" +
+                        "          <tbody>\n" +
+                        "            <tr>\n" +
+                        "              <td style=\"padding-top: 12px;\">\n" +
+                        "                <span style=\"font-size: 17px;color: #c6d4df;font-family: Arial, Helvetica, sans-serif;font-weight: bold;\">\n" +
+                        "                  <p>Пароль был изменен.</p>\n" +
+                        "                </span>\n" +
+                        "              </td>\n" +
+                        "            </tr>\n" +
+                        "          </tbody>\n" +
+                        "        </table>\n" +
+                        "      </td>\n" +
+                        "    </tr>\n" +
+                        "  </tbody>\n" +
+                        "</table>\n";
+                emailService.sendMail(senderName, u.getUsername(), "Технокарта. Пароль изменился.",
+                        message);
                 u = userRepository.save(u);
                 return "true";
             }
