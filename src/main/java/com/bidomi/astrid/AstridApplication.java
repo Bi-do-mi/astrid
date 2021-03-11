@@ -26,6 +26,6 @@ public class AstridApplication extends SpringBootServletInitializer {
         System.out.println("app started");
 //        System.out.println("Spring version: " + SpringVersion.getVersion()
 //                + "Spring Security version" + SpringSecurityCoreVersion.getVersion());
-   // jjj
+   // jj
     }
 }
