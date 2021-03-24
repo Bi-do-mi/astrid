@@ -87,7 +87,7 @@ public class SearchController {
                 u.setWorkEnd(null);
             }
         });
-        return user;
+        return userRepository.save(user);
     }
 
     @PutMapping("get_owner")

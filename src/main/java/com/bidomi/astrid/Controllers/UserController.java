@@ -138,8 +138,8 @@ public class UserController {
                     "  </tbody>\n" +
                     "</table>\n";
 
-            emailService.sendMail(senderName, user.getUsername(), "Технокарта. Регистрация.", message);
-            emailService.sendMail(senderName, senderName, "Технокарта. Регистрация.", message);
+            emailService.sendMail(senderName, user.getUsername(), "Технокарта. Регистрация нового пользователя.", message);
+            emailService.sendMail(senderName, senderName, "Технокарта. Регистрация новго пользователя.", message);
             ScheduledExecutorService executorService = Executors.newSingleThreadScheduledExecutor();
             TimerTask deleteUser = new TimerTask() {
                 @Override
@@ -273,7 +273,7 @@ public class UserController {
                     public void run() {
                         User userFromRepo = userRepository.findById(savedUserId).get();
                         if ((userFromRepo.getConfirmationToken() != null) &&
-                        userFromRepo.getConfirmationToken().equals(confirmationToken)) {
+                                userFromRepo.getConfirmationToken().equals(confirmationToken)) {
                             userFromRepo.setConfirmationToken(null);
                             userRepository.save(userFromRepo);
                         }
@@ -301,7 +301,7 @@ public class UserController {
     @GetMapping("/sign_in")
     @ResponseBody
     public User signIn(@RequestParam(value = "token") String token) {
-        System.out.println("In /sign_in");
+//        System.out.println("In /sign_in");
         String currentPrincipalName = SecurityContextHolder.getContext().getAuthentication().getName();
         try {
             User u = userRepository.findByUsername(currentPrincipalName).get();
@@ -617,10 +617,15 @@ public class UserController {
     @GetMapping(path = "/hello")
     public @ResponseBody
     String getHello() {
+        try {
 //        System.out.println(messageService.getMessage());
 //        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 //        String currentPrincipalName = authentication.getName();
-//        System.out.println("getAll()" + currentPrincipalName);
-        return "Helloooo";
+//        System.out.println("in-hello");
+            return "{\"Hello\": \"Hellooo\"}";
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
     }
 }
